@@ -5,10 +5,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-public class U {
-	/*
 
-	*/
+/*
+*/
+public class U {
+
 	public static final int MAX_ROWS = 200;
 
 	public static String logPath(String file) {

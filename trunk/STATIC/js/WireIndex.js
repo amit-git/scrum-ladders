@@ -21,6 +21,8 @@ $( document ).ready(function() {
 	
 			ENV.AllRows = data.Rows;
 			ENV.AllParentRows = data.ParentRows;
+			
+			
 			wirePage();
 	
 			var endTime = (new Date()).getTime();

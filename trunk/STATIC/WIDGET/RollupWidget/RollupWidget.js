@@ -62,16 +62,19 @@ Widget.RollupWidget = function(){
 			if (colorArr.length>0)colorArr.push(","); colorArr.push(colorVal);
 			
 		}
-		
-		var htm = ["<img src='https://chart.googleapis.com/chart?cht=p&chf=bg,s,"+me.backgroundColor+"&chd=s:Uf9a&chs="+me.size];
-		
-		htm.push("&chl="); htm.push(labelArr.join(""));
-		htm.push("&chd=t:"); htm.push(valArr.join(""));
-		htm.push("&chco="); htm.push(colorArr.join(""));
-		
-		
-		htm.push("' />");
-		return htm.join("");		
+		if (i==0){
+			return "";
+		}else{
+			var htm = ["<img src='https://chart.googleapis.com/chart?cht=p&chf=bg,s,"+me.backgroundColor+"&chd=s:Uf9a&chs="+me.size];
+			
+			htm.push("&chl="); htm.push(labelArr.join(""));
+			htm.push("&chd=t:"); htm.push(valArr.join(""));
+			htm.push("&chco="); htm.push(colorArr.join(""));
+			
+			
+			htm.push("' />");
+			return htm.join("");
+		}
 		
 	};//groupRollupVal()
 	

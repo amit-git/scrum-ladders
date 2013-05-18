@@ -16,19 +16,6 @@ import com.sun.net.httpserver.HttpHandler;
 
 public class FileReadHandler implements HttpHandler {
 
-	/*
-	private void writeAndClose(String out, HttpExchange exchange) throws IOException {
-		Headers responseHeaders = exchange.getResponseHeaders();
-		responseHeaders.set("Content-Type", "text/html");
-		exchange.sendResponseHeaders(200, 0);
-		OutputStream responseBody = exchange.getResponseBody();
-
-		responseBody.write(out.getBytes());
-
-		responseBody.close();
-
-	}
-	*/
 
 	@Override
 	public void handle(HttpExchange exchange) throws IOException {
@@ -49,6 +36,8 @@ public class FileReadHandler implements HttpHandler {
 		Headers responseHeaders = exchange.getResponseHeaders();
 		if (absPath.endsWith(".png")) {
 			handleBinary("img/png", responseHeaders, exchange, f);
+		} else if (absPath.endsWith(".gif")) {
+			handleBinary("img/gif", responseHeaders, exchange, f);
 		} else if (absPath.endsWith(".jpg")) {
 			handleBinary("img/jpg", responseHeaders, exchange, f);
 		} else if (absPath.endsWith(".js")) {

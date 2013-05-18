@@ -37,8 +37,8 @@ public class CreateNewLadder extends BaseHandler2 {
 		if (!ladders.contains(name)) {
 			String parentId1 = "ROOT";
 			String parentId2 = "ROOT";
-			for (LaddersContextModel context : ltm.Contexts) {
-				U.log("context.Name:" + context.Name);
+			for (LaddersContextModel context : ltm.getContexts()) {
+				U.log("context.Name:" + context.getName());
 				parentId1 = insertRow(name, context, parentId1);
 				parentId2 = insertRow(name, context, parentId2);
 			}
@@ -53,16 +53,16 @@ public class CreateNewLadder extends BaseHandler2 {
 		HashMap<String, String> params = new HashMap<String, String>();
 		params.put(Cols.PARENTID, parentId);
 
-		for (LaddersSchemaModel sm : context.Schema) {
+		for (LaddersSchemaModel sm : context.getSchema()) {
 			U.log("  Schema.Name:" + sm.Name);
 			if (sm.Args.size() > 0) {
 				params.put(sm.Name, sm.Args.get((new Random()).nextInt(sm.Args.size() - 1)));
 			} else {
-				params.put(sm.Name, context.Name + " for " + parentId);
+				params.put(sm.Name, context.getName() + " for " + parentId);
 			}
 		}
 
-		BasicDBObject row = DataStorage.get(ladderName).insertNew(context.Name, params);
+		BasicDBObject row = DataStorage.get(ladderName).insertNew(context.getName(), params);
 
 		return row.get(Cols.ROWID).toString();
 

@@ -175,7 +175,7 @@ public abstract class BaseHandler2 {
 					List values = (List) obj;
 					values.add(value);
 				} else if (obj instanceof String) {
-					List values = new ArrayList();
+					ArrayList<String> values = new ArrayList<String>();
 					values.add((String) obj);
 					values.add(value);
 					parameters.put(key, "LIST???" + values.toString());

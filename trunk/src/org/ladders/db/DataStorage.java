@@ -464,6 +464,9 @@ public class DataStorage {
 	}// insert
 
 	public ArrayList<BasicDBObject> getRows(String fieldName, HashSet<String> documentIds) throws Exception {
+		if (documentIds.size()==0){
+			return new ArrayList<BasicDBObject>();
+		}
 		BasicDBList docIds = new BasicDBList();
 		docIds.addAll(documentIds);
 		DBObject inClause = new BasicDBObject("$in", docIds);
