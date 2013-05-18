@@ -1,0 +1,39 @@
+
+<h1>WHAT IS LADDERS?</h1>
+LADDERS is a simple SCRUM management software. 
+It is built on the basic assumption of hierarchical nature of tasks performed in an organization. 
+If a developer is working on a coding task, that task must belong to one of the stories his manager has committed to. 
+Every story that manager has must align with one of the initiative business team has in their plan. 
+And every business initiative must align with one of the projects Director or CEO has agreed to. 
+This hierarchy of tasks is referred to as LADDER. 
+
+<h1>RUNNING LADDERS</h1>
+1] Run the default mongod.exe on the command line. (mongodb://localhost:27017/test)
+2] Run the StartLadders.main. It will open http server on port 82.
+3] Open browser: http://localhost:82
+
+<h1>LADDERS TENETS</h1> 
+<ol>
+<li>LADDERS allows customization of steps in the ladder (Schema.js). It can be as simple as Story->Task. Or as complex as Strategy->Project->Epic->Subepic->Story->Task-Subtask.</li>
+<li>LADDERS embraces the idea of agile. It allows dynamic schemas. The columns/fields can be changed, added, or removed from the schema without losing data from the existing rows.</li>
+<li>LADDERS works stand-alone as a web server and doesn't need TomCat or other servlet container to run.</li>
+<li>LADDERS is simple and can be customized to fit any complex needs of any SCRUM project. </li>
+<li>LADDERS will always be fast. The server side latency of every request will never exceed 500ms regardless of number of rows in the db.</li>
+<li>LADDERS won't have any edit/save buttons. Developers hate to update tools. Let's make it as easy as possible. </li>
+<li>LADDERS won't have any pagination. It displays maximum 200 rows in a single view. Use filters beyond that to get to what you want.</li> 
+</ol>
+
+<h1>HISTORY</h1>
+After using ~10 different project management tools over last 16 years, I realized I need to write my own tool that makes sense.
+I started thinking about hierarchical concept of tasks in around 2008. Then in 2010, Amit and I agreed that this needs to be done. 
+We had agreed on most of the ideas while our kids played in the background. Then we got busy with our lives and forgot about LADDERS.
+I finally got motivated in Mar 2013 during my vacation in India and wrote the ver1.0 of LADDERS.
+
+As much as I enjoyed coding it, I am quickly realizing that I am not the best developer to take it forward. 
+As code starts getting complex, it needs someone who is a better coder than me and has more development discipline to write quality code.
+My current code will fail very basic code review rules. Hopefully someone will make it better or just rewrite the whole thing from scratch.
+
+
+<h1>ROLLUPS</h1>
+Everything rolls up in LADDERS. Every numeric and text value from the group rolls up to the parents.
+
