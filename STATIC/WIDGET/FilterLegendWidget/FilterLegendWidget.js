@@ -1,9 +1,15 @@
 
 Widget.FilterLegendWidget = function(cChildRowType){
 
+	
 	var getParents = function(){
 		var map = {};
 		var arr = [];
+		
+		if (ENV.ParentId){
+			map[ENV.ParentId] = 1;
+			arr.push(ENV.ParentId);
+		}
 		for (var i=0; i<ENV.AllRows.length; i++){
 			var pid = ENV.AllRows[i][ENV.PARENTID];
 			if (map[pid]) continue;
@@ -11,7 +17,8 @@ Widget.FilterLegendWidget = function(cChildRowType){
 			arr.push(pid);
 		}
 		return arr;
-	};//
+	};
+	
 	this.render = function(div){
 		
 		var parentContext = Utils.getParentContextByName(cChildRowType);
@@ -32,10 +39,10 @@ Widget.FilterLegendWidget = function(cChildRowType){
 			params[ENV.ROWID] = allParentsArr[0];
 			var url = SERVER.url(parentContext.Name, params); 
 
-			var htm = [];
 			htm.push("<br/><a href='");
 			htm.push(url);
 			htm.push ("'>back to the parent "+parentContext.Name);
+			htm.push (": " + allParentsArr[0]);
 			htm.push("</a>");			
 		}
 		

@@ -1,6 +1,7 @@
 .errorHead {
 	color: red;
 }
+.nobr	{ white-space:nowrap; }
 
 .ld_body {
 	font-family: "lucida grande", tahoma, verdana, arial, sans-serif;
@@ -113,7 +114,6 @@
 }
 
 .ld_tab {
-	width: 100%;
 	padding: 8px;
 	background-color: #3b5998;
 	color: #dddddd;
@@ -133,9 +133,3 @@
 	margin-right: 20px;
 }
 
-.ld_logo {
-	background-image: url('/STATIC/images/Logo.png');
-	background-repeat: no-repeat;
-	width: 100px;
-	height: 80px;
-}

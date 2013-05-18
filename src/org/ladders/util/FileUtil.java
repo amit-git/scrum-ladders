@@ -81,7 +81,7 @@ public class FileUtil {
 
 		} catch (Exception ex) {
 			// ex.printStackTrace();
-			// U.log("File not found:"+ex);
+			U.log("File not found:"+ex);
 		}
 		return null;
 	}

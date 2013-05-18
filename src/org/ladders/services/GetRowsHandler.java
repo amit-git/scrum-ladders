@@ -47,16 +47,19 @@ public class GetRowsHandler extends BaseHandler2 {
 		}
 
 		ArrayList<BasicDBObject> allRows = dao.getRows(criteria, fields);
-
 		tsLogger.log("Got-" + allRows.size() + "-rows");
-
-		HashSet<String> grandpaIds = getUniqueVals(Cols.GRANDPAID, allRows);
-
+		
 		ArrayList<BasicDBObject> allParentRows = new ArrayList<>();
-
-		if (inputParams.containsKey("INCLUDE_PARENTS")) {
-			allParentRows = dao.getRows(Cols.PARENTID, grandpaIds);
-			tsLogger.log("Got-" + allParentRows.size() + "-Parents");
+		if (allRows.size()>0){
+			HashSet<String> grandpaIds = getUniqueVals(Cols.GRANDPAID, allRows);
+			if (inputParams.containsKey("INCLUDE_PARENTS")) 
+			{
+				allParentRows = dao.getRows(Cols.PARENTID, grandpaIds);
+				if (allParentRows.size()==0){
+					allParentRows.add(dao.getRow(parentId));
+				}
+				tsLogger.log("Got-" + allParentRows.size() + "-Parents");
+			}
 		}
 
 		StringBuffer buf1 = new StringBuffer("{");
