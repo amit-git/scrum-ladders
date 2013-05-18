@@ -1,0 +1,524 @@
+package org.ladders.db;
+
+import java.io.File;
+import java.net.UnknownHostException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+
+import org.ladders.util.Cols;
+import org.ladders.util.FileUtil;
+import org.ladders.util.JsonUtil;
+import org.ladders.util.U;
+
+import com.mongodb.BasicDBList;
+import com.mongodb.BasicDBObject;
+import com.mongodb.DB;
+import com.mongodb.DBCollection;
+import com.mongodb.DBCursor;
+import com.mongodb.DBObject;
+import com.mongodb.MongoClient;
+import com.mongodb.MongoClientURI;
+import com.mongodb.WriteResult;
+import com.sun.xml.internal.fastinfoset.stax.events.Util;
+
+class TransactionStatus1 {
+	public String json;
+	public int updateCount;
+	public BasicDBObject row;
+}
+
+public class DataStorage {
+
+	//private static final String TEXT_URI = "mongodb://localhost:27017/test";
+	private static String dbUrl = null;
+	private static final String SETTINGS_TABLE = "SettingsTable3";
+	private static final String ROWS_TABLE = "RowsTable3";
+	public static boolean VALIDATE = true;
+
+	private DBCollection rowsTable = null;
+	private DBCollection settTable = null;
+
+	private static HashMap<String, DataStorage> pool = new HashMap<>();
+
+	//No locking. Worst case we will get 2 instances. We can prime it later if it becomes a big problem.
+	public static DataStorage get(String ladderName) throws Exception {
+		if (!pool.containsKey(ladderName))
+			pool.put(ladderName, new DataStorage(ladderName));
+		return pool.get(ladderName);
+	}
+
+	public static void reset() throws Exception {
+		pool = new HashMap<>();
+	}
+
+	public static List<String> getAllLadders() throws Exception {
+		validateDbConnection();
+		MongoClientURI uri = new MongoClientURI(dbUrl);
+		MongoClient m = new MongoClient(uri);
+		List<String>  list = m.getDatabaseNames();
+		m.close();
+		
+		return list;
+	}
+
+	
+	private static void validateDbConnection() throws Exception {
+		//if (Util.isEmptyString(dbUrl))
+		{
+			dbUrl = FileUtil.readTextFromTile( U.startPath("/STATIC/SETTINGS/DBConnection.txt"));
+			dbUrl = dbUrl.trim();
+		}
+		if (Util.isEmptyString(dbUrl)){
+			throw new Exception("Database Connection not specified");
+		}else{
+			U.log("validateDbConnection URL:"+dbUrl);
+		}
+	}	
+	private DataStorage(String ladderName) throws Exception {
+		validateDbConnection();
+		if (Util.isEmptyString(ladderName)){
+			throw new Exception("LADDER can't be null");
+		}
+		
+		
+		MongoClientURI uri = new MongoClientURI(dbUrl);
+		MongoClient m = new MongoClient(uri);
+		DB db2 = m.getDB(ladderName);
+		rowsTable = db2.getCollection(ROWS_TABLE);
+		settTable = db2.getCollection(SETTINGS_TABLE);
+
+		{
+			// Make _rowId unique
+			BasicDBObject query = new BasicDBObject(Cols.ROWID, 1);
+			rowsTable.ensureIndex(query, "_rowId_unique", true);
+		}
+		{
+			// Index by priority and by created date
+			BasicDBObject query = new BasicDBObject(Cols.PRIORITY, 1).append(Cols.CREATED_DATE, 1);
+			rowsTable.ensureIndex(query, "_pri_createddate_sort");
+		}
+
+		{
+			// Index by parentId
+			BasicDBObject query = new BasicDBObject(Cols.PARENTID, 1);
+			rowsTable.ensureIndex(query, "_parent_sort");
+		}
+	}
+
+	/*
+	public ArrayList<BasicDBObject> getRows(String rowType, HashMap<String, String> params) throws Exception {
+
+		BasicDBObject criteria = new BasicDBObject();
+
+		for (Entry<String, String> pair : params.entrySet()) {
+			String v = pair.getValue();
+			String[] arr = v.split(",");
+			if (arr.length > 1) {
+				BasicDBList docIds = new BasicDBList();
+				docIds.addAll(Arrays.asList(arr));
+				DBObject inClause = new BasicDBObject("$in", docIds);
+				criteria.append(pair.getKey(), inClause);
+			} else {
+				criteria.append(pair.getKey(), v);
+			}
+		}
+
+		if (rowType != null)
+			criteria.append(Cols.ROWTYPE, rowType);
+
+		return getRows(criteria);
+	}
+	*/
+	public String getAllRowsInLadder(String rowId) throws Exception {
+
+		StringBuffer buf = new StringBuffer();
+
+		BasicDBObject row = null;
+		while ((row = getRow(rowId)) != null) {
+			if (buf.length() == 0) {
+				buf.append("[");
+			} else {
+				buf.append(",");
+			}
+
+			buf.append(row.toString());
+			rowId = row.getString(Cols.PARENTID);
+		}
+		buf.append("]");
+		return buf.toString();
+	}
+
+	public ArrayList<BasicDBObject> getRows(BasicDBObject criteria, BasicDBObject fields) throws Exception {
+		// criteria.
+		U.log("SELECT " + fields + " FROM WHERE " + criteria);
+
+		DBCursor cursor = fields != null ? rowsTable.find(criteria, fields) : rowsTable.find(criteria);
+
+		cursor.sort(new BasicDBObject(Cols.PRIORITY, 1).append(Cols.CREATED_DATE, 1));
+		cursor.limit(U.MAX_ROWS);
+
+		ArrayList<BasicDBObject> arr = new ArrayList<>();
+		ArrayList<BasicDBObject> badArr = new ArrayList<>();
+
+		while (cursor.hasNext()) {
+			BasicDBObject row = (BasicDBObject) cursor.next();
+
+			// try {
+			validateRow(row);
+			// } catch (Exception ex) {
+			// badArr.add(row);
+			// continue;
+			// }
+			if (arr.size() > U.MAX_ROWS)
+				break;
+
+			arr.add(row);
+		}
+
+		// Looks like sort isn't working. I will figure it out later.
+		// For now sort it again.
+		Collections.sort(arr, new Comparator<BasicDBObject>() {
+			@Override
+			public int compare(BasicDBObject row1, BasicDBObject row2) {
+				double d1 = U.tryParse(row1.getString(Cols.PRIORITY));
+				double d2 = U.tryParse(row2.getString(Cols.PRIORITY));
+				return (int) (d1 - d2);
+			}
+		});
+		for (BasicDBObject row : badArr) {
+			rowsTable.remove(row);
+		}
+		return arr;
+	}
+
+	public BasicDBObject getRow(String rowId) throws Exception {
+		BasicDBObject criteria = new BasicDBObject(Cols.ROWID, rowId);
+		ArrayList<BasicDBObject> arr = getRows(criteria, null);
+		if (arr.size() == 0)
+			return null;
+		return arr.get(0);
+	}
+
+	public String getSetting(String key) throws UnknownHostException {
+		BasicDBObject criteria = new BasicDBObject("KEY", key);
+		DBCursor cursor = settTable.find(criteria);
+		if (cursor.hasNext()) {
+			DBObject row = cursor.next();
+			return row.get("VAL").toString();
+		}
+		return null;
+	}
+
+	public void setSetting(String key, String val) throws Exception {
+
+		BasicDBObject criteria = new BasicDBObject("KEY", key);
+		BasicDBObject newVal = new BasicDBObject("KEY", key);
+		newVal.append("VAL", val);
+
+		WriteResult result = settTable.update(criteria, newVal);
+		if (result.getN() == 0) {
+			// No update done. Just insert it.
+			settTable.insert(newVal);
+		}
+	}
+
+	public String update(HashMap<String, String> params) throws Exception {
+
+		String _rowId = params.get(Cols.ROWID);
+		if (_rowId == null)
+			throw new Exception("Can't update without _rowId:" + _rowId);
+
+		BasicDBObject row = getRow(_rowId);
+
+		for (Entry<String, String> pair : params.entrySet()) {
+			String k = pair.getKey();
+			String v = pair.getValue();
+			indexBy(k);
+			row.append(k, v);
+		}
+
+		validateRow(row);
+
+		row.put(Cols.UPDATE_DATE, new java.util.Date());
+
+		rowsTable.update(new BasicDBObject(Cols.ROWID, _rowId), row);
+
+		// Now update the rollups
+		updateRollups(row, params, 0);
+
+		return row.toString();
+	}
+
+	private void updateRollups(final BasicDBObject row, HashMap<String, String> params, final int rollupLevel)
+			throws Exception {
+
+		String rollupToId = null;
+		BasicDBObject rollupToRow = row;
+		for (int i = 0; i <= rollupLevel; i++) {
+			rollupToId = rollupToRow.getString(Cols.PARENTID);
+			rollupToRow = getRow(rollupToId);
+			if (rollupToRow == null)
+				return;
+		}
+
+		String rowId = row.getString(Cols.ROWID);
+		U.log(" FOR rollupToId:" + rollupToId);
+		// 0:1,5:1,10:1
+		// Multilevel rollups ,ST111:Dev1,ST111:Dev2,ST222:Dev3
+		for (Entry<String, String> pair : params.entrySet()) {
+			String k = pair.getKey();
+			if (k.startsWith("_"))
+				continue;
+
+			k = Cols.ROLLUP_PREFIX + k;
+
+			HashMap<String, String> rollupMap = null;
+			if (rollupToRow.containsField(k)) {
+				rollupMap = (HashMap<String, String>) rollupToRow.get(k);
+				U.log(k + " - rollupMap:" + rollupMap);
+			} else {
+				rollupMap = new HashMap<>();
+			}
+
+			String v = pair.getValue();
+
+			if (v == null) {
+				// Delete this entry from the rollup. His ass got deleted.
+				rollupMap.remove(rowId);
+			} else {
+				if (v.length() >= 20)
+					v = v.substring(0, 20);
+				rollupMap.put(rowId, v); // ST111:5
+			}
+
+			// Replace it back
+			rollupToRow.put(k, rollupMap);
+		}
+
+		rowsTable.update(new BasicDBObject(Cols.ROWID, rollupToId), rollupToRow);
+
+		// Rollup more.
+		updateRollups(row, params, rollupLevel + 1);
+	}
+
+	/*
+	private void updateRollups(BasicDBObject row, HashMap<String, String> params) throws Exception {
+
+		HashSet<String> rollupKeys = new HashSet<>();
+		for (Entry<String, String> pair : params.entrySet()) {
+			String k = pair.getKey();
+			String v = pair.getValue();
+			double doubleVal = U.tryParse(v);
+			if (doubleVal != 0) {
+				rollupKeys.add(k);
+			}
+		}
+		
+		String parentId = row.getString(Cols.PARENTID);
+
+		// get all siblings
+		ArrayList<BasicDBObject> siblings = getRows(new BasicDBObject(Cols.PARENTID, parentId));
+		for (final String key : rollupKeys) {
+			double total = 0;
+			for (final BasicDBObject sibling : siblings) {
+				double d = U.tryParse( sibling.getString(key) );
+				total += d;
+			}// siblings
+
+			// update parent for this rollup
+			BasicDBObject parentRow = getRow(parentId);
+			parentRow.put("_ROLLUP_" + key, "" + total);
+			rowsTable.update(new BasicDBObject(Cols.ROWID, parentId), parentRow);
+
+		}// for rollupKey
+
+	}//updateRollups()
+	*/
+
+	private void indexBy(String key) {
+		// Index by field
+		BasicDBObject query = new BasicDBObject(key, 1);
+		rowsTable.ensureIndex(query, "_key_" + key + "_sort");
+	}
+
+	private static void validateRow(BasicDBObject row) throws Exception {
+
+		if (!VALIDATE)
+			return;
+
+		String _parentId = row.getString(Cols.PARENTID);
+		String _rowId = row.getString(Cols.ROWID);
+		if (_rowId == null)
+			throw new Exception("BAD ROW _rowId:" + _rowId + " row:"+row);
+
+		if (_parentId.equals(_rowId))
+			throw new Exception("BAD ROW _rowId:" + _rowId + " _parentId:" + _parentId);
+		else if (_parentId.substring(0, 2).equals(_rowId.substring(0, 2)))
+			throw new Exception("BAD ROW _rowId:" + _rowId + " _parentId:" + _parentId);
+
+		if (!row.containsField(Cols.ROWTYPE)) {
+			throw new Exception(Cols.ROWTYPE + " must exist in the row:" + JsonUtil.toJson(row));
+		}
+		if (!row.containsField(Cols.PRIORITY)) {
+			throw new Exception(Cols.PRIORITY + " must exist in the row:" + JsonUtil.toJson(row));
+		}
+		if (!row.containsField(Cols.GRANDPAID)) {
+			throw new Exception(Cols.GRANDPAID + " must exist in the row:" + JsonUtil.toJson(row));
+		}
+
+	}
+
+	private void validate(Map<String, String> params) throws Exception {
+		if (!params.containsKey(Cols.PARENTID))
+			throw new Exception(Cols.PARENTID + " needed.");
+		if (params.get(Cols.PARENTID).equals("ROOT"))
+			return;
+
+		// Make sure PARENTID exists
+		BasicDBObject parentRow = getRow(params.get(Cols.PARENTID));
+		if (parentRow == null)
+			throw new Exception(params.get(Cols.PARENTID) + " Parent doesn't exist.");
+	}
+
+	private String getNextId(String rowType) throws Exception {
+
+		rowType = rowType.substring(0, 2).toUpperCase();
+
+		String key = rowType + "_nextId";
+
+		long id = 0;
+		synchronized (this) { // can optimize this further
+			// U.log("key:"+key);
+			String nextId = getSetting(key);
+			// U.log("nextId:"+nextId );
+			if (nextId != null)
+				id = Long.parseLong(nextId);
+			id++;
+			setSetting(key, "" + id);
+			// U.log("id:"+id );
+		}
+
+		String base32 = Long.toString(id, 32);
+		return rowType + "-" + base32;
+	}
+
+	private long getCurrentIdIndex(String rowType) throws Exception {
+		rowType = rowType.substring(0, 2).toUpperCase();
+		String key = rowType + "_nextId";
+
+		String nextId = getSetting(key);
+		long id = (nextId == null) ? 0 : Long.parseLong(nextId);
+		return id;
+	}
+
+	public BasicDBObject insertNew(String rowType, HashMap<String, String> params) throws Exception {
+		validate(params);
+		if (rowType == null)
+			throw new Exception("rowType is NULL");
+
+		String _rowId = getNextId(rowType);
+		params.put(Cols.ROWID, _rowId);
+
+		// ---validate
+		String _parentId = params.get(Cols.PARENTID);
+		if (_parentId.equals(_rowId))
+			throw new Exception("_rowId:" + _rowId + " _parentId:" + _parentId);
+		else if (_parentId.substring(0, 2).equals(_rowId.substring(0, 2)))
+			throw new Exception("_rowId:" + _rowId + " _parentId:" + _parentId);
+
+		BasicDBObject row = new BasicDBObject();
+		for (Entry<String, String> pair : params.entrySet()) {
+			indexBy(pair.getKey());
+			row.append(pair.getKey(), pair.getValue());
+		}
+
+		row.append(Cols.ROWTYPE, rowType);
+
+		row.put(Cols.CREATED_DATE, new java.util.Date());
+		row.put(Cols.UPDATE_DATE, new java.util.Date());
+		row.put(Cols.PRIORITY, getCurrentIdIndex(rowType));
+
+		// put grandpa id
+		if (!_parentId.equals("ROOT")) {
+			String grandpaId = getRow(_parentId).getString(Cols.PARENTID);
+			row.put(Cols.GRANDPAID, grandpaId);
+		} else {
+			row.put(Cols.GRANDPAID, "GRANDROOT");
+		}
+
+		validateRow(row);
+
+		rowsTable.save(row);
+
+		// Now update the rollups
+		updateRollups(row, params, 0);
+
+		return row;
+	}// insert
+
+	public ArrayList<BasicDBObject> getRows(String fieldName, HashSet<String> documentIds) throws Exception {
+		BasicDBList docIds = new BasicDBList();
+		docIds.addAll(documentIds);
+		DBObject inClause = new BasicDBObject("$in", docIds);
+		BasicDBObject criteria = new BasicDBObject(fieldName, inClause);
+
+		return getRows(criteria, null);
+	}
+
+	public ArrayList<BasicDBObject> delete(String rowId) throws Exception {
+
+		// See if this row has any children. If yes, don't delete it
+		//BasicDBObject fields = new BasicDBObject(Cols.ROWID, 1);
+		int numberOfChildren = getRows(new BasicDBObject(Cols.PARENTID, rowId), null).size();
+		U.log(rowId+ " numberOfChildren:"+numberOfChildren);
+		if (numberOfChildren > 0) {
+			throw new Exception("Can't delete parent without deleting children. (" + numberOfChildren + ")");
+		}
+		
+		
+
+		BasicDBObject row = getRow(rowId);
+		rowsTable.remove(row);
+
+		// Now update the rollups
+		HashMap<String, String> params = new HashMap<>();
+		for (Entry<String, Object> pair : row.entrySet()) {
+			if (pair.getKey().startsWith("_"))
+				continue;
+			params.put(pair.getKey(), null);
+		}
+		updateRollups(row, params, 0);
+
+		ArrayList<BasicDBObject> rows = new ArrayList<BasicDBObject>();
+		rows.add(row);
+		return rows;
+	}
+
+	public void delete(BasicDBObject row) throws Exception {
+		rowsTable.remove(row);
+	}
+
+	public static StringBuffer toJson(ArrayList<BasicDBObject> rows) throws UnknownHostException {
+
+		StringBuffer buf = new StringBuffer();
+		buf.append("[");
+
+		for (DBObject row : rows) {
+			if (buf.length() > 1)
+				buf.append(",\n");
+			// if (row.toString().equals("null")) continue;
+			buf.append(row.toString());
+		}
+		buf.append("]");
+		return buf;
+
+	}
+
+}
