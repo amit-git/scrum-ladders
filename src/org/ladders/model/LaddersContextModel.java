@@ -8,17 +8,23 @@ import org.json.JSONObject;
 
 public class LaddersContextModel
 {
-	public String Name;
-	public List<LaddersSchemaModel>	Schema = new ArrayList<LaddersSchemaModel>();
+	private String name;
+	private List<LaddersSchemaModel>	schema = new ArrayList<LaddersSchemaModel>();
 	
+	public String getName(){
+		return name;
+	}
+	public List<LaddersSchemaModel> getSchema(){
+		return schema;
+	}
 	public LaddersContextModel(JSONObject contextObj){
-	    Name = contextObj.getString("Name");
+	    name = contextObj.getString("Name");
 	    JSONArray contextSchema = contextObj.getJSONArray("Schema");
 	    
 		for(int j = 0 ; j < contextSchema.length() ; j++){
 		    JSONObject fieldObj = contextSchema.getJSONObject(j);
 		    LaddersSchemaModel s = new LaddersSchemaModel(fieldObj);
-		    Schema.add(s);
+		    schema.add(s);
 		}//for j
 
 	}//LaddersContextModel()

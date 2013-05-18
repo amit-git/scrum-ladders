@@ -7,7 +7,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 public class LaddersTopologyModel{
-	public List<LaddersContextModel> Contexts = new ArrayList<LaddersContextModel>();
+	private List<LaddersContextModel> contexts = new ArrayList<LaddersContextModel>();
 	
 	public LaddersTopologyModel(String schema){
 		JSONArray arrRowTypes = new JSONArray(schema);
@@ -15,7 +15,7 @@ public class LaddersTopologyModel{
 		for(int i = 0 ; i < arrRowTypes.length() ; i++){
 		    JSONObject contextObj = arrRowTypes.getJSONObject(i);
 		    LaddersContextModel c = new LaddersContextModel(contextObj);
-		    Contexts.add(c);
+		    contexts.add(c);
 		}//for i
 		
 	}//LaddersTopologyModel()
@@ -23,7 +23,7 @@ public class LaddersTopologyModel{
 	public StringBuffer getJson(){
 		StringBuffer buf = new StringBuffer();
 		buf.append("[\n\n");
-		for (LaddersContextModel lcm : Contexts){
+		for (LaddersContextModel lcm : contexts){
 			if (buf.length()==1){
 				buf.append(",\n");
 			}
@@ -31,6 +31,10 @@ public class LaddersTopologyModel{
 		}
 		buf.append("\n\n]");
 		return buf;
+	}
+
+	public List<LaddersContextModel> getContexts() {
+		return contexts;
 	}
 	
 }//class LaddersTopologyModel
