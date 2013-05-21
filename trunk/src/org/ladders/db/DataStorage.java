@@ -157,7 +157,7 @@ public class DataStorage {
 
 	public ArrayList<BasicDBObject> getRows(BasicDBObject criteria, BasicDBObject fields) throws Exception {
 		// criteria.
-		U.log("SELECT " + fields + " FROM WHERE " + criteria);
+		//U.log("SELECT " + fields + " FROM WHERE " + criteria);
 
 		DBCursor cursor = fields != null ? rowsTable.find(criteria, fields) : rowsTable.find(criteria);
 
@@ -269,7 +269,7 @@ public class DataStorage {
 		}
 
 		String rowId = row.getString(Cols.ROWID);
-		U.log(" FOR rollupToId:" + rollupToId);
+		//U.log(" FOR rollupToId:" + rollupToId);
 		// 0:1,5:1,10:1
 		// Multilevel rollups ,ST111:Dev1,ST111:Dev2,ST222:Dev3
 		for (Entry<String, String> pair : params.entrySet()) {
@@ -282,7 +282,7 @@ public class DataStorage {
 			HashMap<String, String> rollupMap = null;
 			if (rollupToRow.containsField(k)) {
 				rollupMap = (HashMap<String, String>) rollupToRow.get(k);
-				U.log(k + " - rollupMap:" + rollupMap);
+				//U.log(k + " - rollupMap:" + rollupMap);
 			} else {
 				rollupMap = new HashMap<>();
 			}

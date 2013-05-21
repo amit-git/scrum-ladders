@@ -5,11 +5,17 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class RegUtil {
-	public static ArrayList<String> matchAll(String html, String expression,
-			int groupNum) {
+	public static String match(String html, String expression) {
+		Matcher m = Pattern.compile(expression, Pattern.CASE_INSENSITIVE).matcher(html);
+		if (m.find()) {
+			return m.group(1).trim();
+		}
+		return null;
+	}
 
-		Matcher m = Pattern.compile(expression, Pattern.CASE_INSENSITIVE)
-				.matcher(html);
+	public static ArrayList<String> matchAll(String html, String expression, int groupNum) {
+
+		Matcher m = Pattern.compile(expression, Pattern.CASE_INSENSITIVE).matcher(html);
 
 		ArrayList<String> list = new ArrayList<String>();
 
@@ -19,5 +25,5 @@ public class RegUtil {
 		}
 		return list;
 
-	}	
+	}
 }
