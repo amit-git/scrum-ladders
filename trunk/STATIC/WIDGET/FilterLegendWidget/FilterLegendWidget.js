@@ -23,7 +23,7 @@ Widget.FilterLegendWidget = function(cChildRowType){
 		
 		var parentContext = Utils.getParentContextByName(cChildRowType);
 		if (!parentContext){
-			div.html("Showing "+ cChildRowType+"s");
+			div.html("<span class='nobr'>Showing "+ cChildRowType+"s</span>");
 			return;
 		}
 
@@ -31,15 +31,17 @@ Widget.FilterLegendWidget = function(cChildRowType){
 		var totalParents = allParentsArr.length;
 		
 		var htm = [];
+		htm.push("<span class='nobr'>");
 		htm.push("Showing "+ENV.AllRows.length+" "+ cChildRowType+"s for ");
 		htm.push(totalParents + " "+parentContext.Name);
+		htm.push("</span>");
 
 		if (totalParents==1){
 			var params = {};
 			params[ENV.ROWID] = allParentsArr[0];
 			var url = SERVER.url(parentContext.Name, params); 
 
-			htm.push("<br/><a href='");
+			htm.push("<br/><a class='nobr' href='");
 			htm.push(url);
 			htm.push ("'>back to the parent "+parentContext.Name);
 			htm.push (": " + allParentsArr[0]);

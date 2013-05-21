@@ -524,4 +524,10 @@ public class DataStorage {
 
 	}
 
+	public static void removeLadder(String ladderName) throws Exception {
+		DataStorage.get(ladderName);
+		pool.get(ladderName).rowsTable.drop();
+		pool.remove(ladderName);
+	}
+
 }

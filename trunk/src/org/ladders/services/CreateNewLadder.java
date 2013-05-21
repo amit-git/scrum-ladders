@@ -1,8 +1,8 @@
 package org.ladders.services;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Random;
 
 import org.apache.commons.lang3.StringUtils;
 import org.ladders.db.DataStorage;
@@ -10,7 +10,6 @@ import org.ladders.model.LaddersContextModel;
 import org.ladders.model.LaddersSchemaModel;
 import org.ladders.model.LaddersTopologyModel;
 import org.ladders.util.Cols;
-import org.ladders.util.FileUtil;
 import org.ladders.util.SettingsUtil;
 import org.ladders.util.U;
 
@@ -23,9 +22,9 @@ public class CreateNewLadder extends BaseHandler2 {
 
 		List<String> ladders = DataStorage.getAllLadders();
 
-		String name = inputParams.get("LADDER_NAME");
+		ladderName = inputParams.get("LADDER_NAME");
 		String schema = inputParams.get("SCHEMA_JSON");
-		if (StringUtils.isEmpty(name)) {
+		if (StringUtils.isEmpty(ladderName)) {
 			throw new Exception("LADDER name can't be null or empty");
 		}
 		if (StringUtils.isEmpty(schema)) {
@@ -34,31 +33,52 @@ public class CreateNewLadder extends BaseHandler2 {
 
 		LaddersTopologyModel ltm = new LaddersTopologyModel(schema);
 
-		if (!ladders.contains(name)) {
-			String parentId1 = "ROOT";
-			String parentId2 = "ROOT";
-			for (LaddersContextModel context : ltm.getContexts()) {
-				U.log("context.Name:" + context.getName());
-				parentId1 = insertRow(name, context, parentId1);
-				parentId2 = insertRow(name, context, parentId2);
-			}
+		if (ladders.contains(ladderName)) {
+			DataStorage.removeLadder(ladderName);
 		}
-		SettingsUtil.saveSetting("SCHEMA_" + name, schema);
-		successOut("Created LADDER " + name, schema);
 
+		List<LaddersContextModel> contextQ = ltm.getContexts();
+		insertRows(ladderName, "ROOT", contextQ, 0);
+
+		SettingsUtil.saveSetting("SCHEMA_" + ladderName, schema);
+		successOut("Created LADDER " + ladderName, schema);
 	}
 
-	private static String insertRow(String ladderName, LaddersContextModel context, String parentId) throws Exception {
+	static final int TOTAL_TEST_ROWS = 5;
+
+	private static void insertRows(String ladderName, String parentId, List<LaddersContextModel> contextQ, int i)
+			throws Exception {
+
+		if (i>= contextQ.size()) return;
+
+		LaddersContextModel context = contextQ.get(i);
+
+		ArrayList<String> addedRows = new ArrayList<>();
+		for (int j = 0; j < TOTAL_TEST_ROWS; j++) {
+			String rowId = insertRow(j, ladderName, context, parentId);
+			addedRows.add(rowId);
+		}// for j
+
+		i++;
+		for (String rowId : addedRows) {
+			insertRows(ladderName, rowId, contextQ, i);
+		}
+	}
+
+	private static String insertRow(int i, String ladderName, LaddersContextModel context, String parentId)
+			throws Exception {
+
+		U.log(" insertRow :" + parentId);
 
 		HashMap<String, String> params = new HashMap<String, String>();
 		params.put(Cols.PARENTID, parentId);
 
 		for (LaddersSchemaModel sm : context.getSchema()) {
-			U.log("  Schema.Name:" + sm.Name);
+			// U.log("  Schema.Name:" + sm.Name);
 			if (sm.Args.size() > 0) {
-				params.put(sm.Name, sm.Args.get((new Random()).nextInt(sm.Args.size() - 1)));
+				params.put(sm.Name, sm.Args.get(i % sm.Args.size()));
 			} else {
-				params.put(sm.Name, context.getName() + " for " + parentId);
+				params.put(sm.Name, i + "th " + context.getName() + " for " + parentId);
 			}
 		}
 
