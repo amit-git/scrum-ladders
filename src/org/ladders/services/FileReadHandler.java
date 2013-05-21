@@ -22,7 +22,7 @@ public class FileReadHandler implements HttpHandler {
 		String queryUrl = exchange.getRequestURI().toString();
 
 		File f = new File(U.startPath(queryUrl));
-		U.log("Read static: " + f);
+		//U.log("Read static: " + f);
 		if (!f.exists()) {
 			String response = "404 (Not Found)\n";
 			exchange.sendResponseHeaders(404, response.length());

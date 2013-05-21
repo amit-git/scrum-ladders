@@ -70,6 +70,9 @@ SERVER.rows = function(params, scallback, errcallback){
 };
 
 SERVER.update = function(params, scallback, errcallback){
+	
+	//For now every input change on the client side calls update.
+	//That means inputParams should always have size of 2. 1 for rowId and second for the updated field. 
 	SERVER._post("UPDATE", params, scallback, errcallback);	
 };
 

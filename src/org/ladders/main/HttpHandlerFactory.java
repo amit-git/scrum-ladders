@@ -27,8 +27,10 @@ public class HttpHandlerFactory implements HttpHandler {
 			String queryUrl = exchange.getRequestURI().toString();
 			for (BaseHandler2 b : SUPPORTED_SERVICES) {
 				if (queryUrl.contains("/" + b.getName() + "/")) {
-					b.setExchange(exchange);
-					b.handle();
+					//There is a bug in the default HTTP implementation. Working around it by creating new instances
+					BaseHandler2 b2 =  (BaseHandler2)b.getClass().getDeclaredConstructors()[0].newInstance(null);
+					b2.setExchange(exchange);
+					b2.handle();
 					break;
 				}
 			}

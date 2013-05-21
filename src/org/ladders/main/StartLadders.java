@@ -5,17 +5,14 @@ import java.net.InetSocketAddress;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 
-import javax.xml.ws.spi.http.HttpExchange;
-
 import org.ladders.services.BaseHandler2;
 import org.ladders.services.FileReadHandler;
-import org.ladders.util.U;
 
 import com.sun.net.httpserver.HttpContext;
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
 
-//http://www.mkyong.com/mongodb/java-mongodb-hello-world-example/
+////Move to Jetty asap.
 class StartLadders {
 
 	private static void setupHandler(String path, HttpServer server, HttpHandler h) {
@@ -40,7 +37,7 @@ class StartLadders {
 		setupHandler("/", server, new HttpHandler() {
 			@Override
 			public void handle(com.sun.net.httpserver.HttpExchange arg0) throws IOException {
-				U.log("HERE");
+				//U.log("HERE");
 				arg0.getResponseHeaders().add("Location", "/STATIC/html/setup.html");
 				arg0.sendResponseHeaders(302, -1);
 			}

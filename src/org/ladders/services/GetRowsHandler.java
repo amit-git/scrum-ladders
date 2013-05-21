@@ -3,6 +3,7 @@ package org.ladders.services;
 import java.util.ArrayList;
 import java.util.HashSet;
 
+import org.apache.commons.lang3.StringUtils;
 import org.ladders.db.DataStorage;
 import org.ladders.util.Cols;
 import org.ladders.util.JsonUtil;
@@ -12,9 +13,13 @@ import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
 
 public class GetRowsHandler extends BaseHandler2 {
+	
 
 	@Override
 	protected void innerHandle() throws Exception {
+		if (StringUtils.isEmpty(rowType))
+			throw new Exception("No rowType identified");		
+		
 		// AND:f1=20,f2=40,f3=dddd
 		BasicDBObject criteria = new BasicDBObject();
 		if (inputParams.containsKey("AND")) {

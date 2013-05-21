@@ -7,6 +7,7 @@ import java.net.UnknownHostException;
 import java.util.*;
 import java.util.Map.Entry;
 
+import org.apache.commons.lang3.StringUtils;
 import org.json.JSONStringer;
 import org.json.JSONWriter;
 import org.ladders.db.DataStorage;
@@ -53,22 +54,24 @@ public abstract class BaseHandler2 {
 			tsLogger = new TimestampLogger(exchange.getRequestURI().toString());
 			String[] urlquery = queryUrl.split("/");
 
+			U.log("========== "+ this.getClass().getName().replace("org.ladders.services.", "") + " LADDER:" + ladderName + " queryUrl:" + queryUrl);
+			
 			if (isTransactional()) {
 
-				if (urlquery.length<3){
-					U.log("queryUrl:"+queryUrl);
-					U.log("Arr urlquery:"+urlquery);
-					throw new Exception("Transactional service "+this.getName()+" doesn't have a LAdder name passed.");
+				if (urlquery.length < 3) {
+					U.log("queryUrl:" + queryUrl);
+					U.log("Arr urlquery:" + urlquery);
+					throw new Exception("Transactional service " + this.getName()
+							+ " doesn't have a LAdder name passed.");
 				}
 				ladderName = urlquery[2];
-				if (ladderName == null)
+				if (StringUtils.isEmpty(ladderName))
 					throw new Exception("No LADDER identified");
-
-				U.log(this.getClass().getName() + " LADDER:" + ladderName + " queryUrl:" + queryUrl);
 
 				dao = DataStorage.get(ladderName);
 
 			}
+
 
 			for (int i = 3; i < urlquery.length; i++) {
 				String[] pair = splitPair(urlquery[i], ":");
@@ -82,16 +85,26 @@ public abstract class BaseHandler2 {
 
 				// Convenience variables for children
 				if (v.contains("_rowType:"))
-					rowType = RegUtil.matchAll(v, "_rowType:([0-9a-zA-Z]+)", 1).get(0);
+					rowType = RegUtil.match(v, "_rowType:([0-9a-zA-Z]+)");
 				if (v.contains("_parentId:"))
-					parentId = RegUtil.matchAll(v, "_parentId:([0-9a-zA-Z-]+)", 1).get(0);
+					parentId = RegUtil.match(v, "_parentId:([0-9a-zA-Z-]+)");
 
 			}
 
 			parseGetParameters(exchange, inputParams);
 			parsePostParameters(exchange, inputParams);
 
-			U.log("inputParams.containsKey(" + Cols.ROWTYPE + "):" + inputParams.containsKey(Cols.ROWTYPE));
+			String andVals = inputParams.get("AND");
+			if (!StringUtils.isEmpty(andVals)) {
+				if (Util.isEmptyString(rowType))
+					rowType = RegUtil.match(andVals, "_rowType:([0-9a-zA-Z]+)");
+
+				if (Util.isEmptyString(parentId))
+					parentId = RegUtil.match(andVals, "_parentId:([0-9a-zA-Z-]+)");
+			}
+
+			// U.log("inputParams.containsKey(" + Cols.ROWTYPE + "):" +
+			// inputParams.containsKey(Cols.ROWTYPE));
 			if (Util.isEmptyString(rowType) && inputParams.containsKey(Cols.ROWTYPE))
 				rowType = inputParams.get(Cols.ROWTYPE);
 			if (Util.isEmptyString(parentId) && inputParams.containsKey(Cols.PARENTID))
@@ -244,7 +257,7 @@ public abstract class BaseHandler2 {
 			}
 			myString.endObject();
 
-			if (Util.isEmptyString(data)){
+			if (Util.isEmptyString(data)) {
 				data = "null";
 			}
 
