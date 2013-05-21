@@ -114,6 +114,7 @@
 }
 
 .ld_tab {
+	width:100%;
 	padding: 8px;
 	background-color: #3b5998;
 	color: #dddddd;

@@ -20,18 +20,26 @@ Widget.LaddersListWidget = function(mapLadders, errorDiv){
 		htm.push("</td>");
 	}
 	
-	this.render = function(div){
-		var htm = [];
 
+	var renderMainTable = function(div){
+		var htm = [];
 		htm.push("");
-		htm.push("<table class='ld_bluebox' border=1>");
+		htm.push("<table>");
 		htm.push("<tr>");
-		htm.push("<td colspan=4 ></td>");
-		htm.push("<td rowspan=10>");
-		htm.push("	<textarea cols=100 rows=10 id='LadderSchemaText'></textarea>");
+		htm.push("<td id='buttonsDiv' valign=top></td>");
+		htm.push("<td  valign=top>");
+		htm.push("	<textarea cols=100 rows=50 id='LadderSchemaText'></textarea>");
 		htm.push("</td>");
 		htm.push("</tr>");
+		htm.push("</table>");
+		div.html(htm.join(" "));
+	}
+	
+	this.render = function(div){
+		renderMainTable(div);
 
+		var htm = [];
+		htm.push("<table class='ld_bluebox' border=1>");
 		for (var i=0; i<listLadders.length; i++){
 			htm.push("<tr>");
 			var schemaid='schemalink'+i;
@@ -47,19 +55,17 @@ Widget.LaddersListWidget = function(mapLadders, errorDiv){
 		htm.push("<div class='ld_link' id='"+addNewLadderBtn+"'>[Add new Ladder]</div>");
 		htm.push("</td>");
 		htm.push("</tr>");
+		htm.push("</table>");
 
-		div.html(htm.join(" "));
+		$("#buttonsDiv").html(htm.join(" "));
 		
 		for (var i=0; i<listLadders.length; i++){
 			var name = listLadders[i];
 			attachLoadSchema(i, name);
 		}
-
-
 		
 		$("#"+addNewLadderBtn).click(addNewLadder);
 
-		
 	}//render*()
  
 	var addNewLadder = function(){
