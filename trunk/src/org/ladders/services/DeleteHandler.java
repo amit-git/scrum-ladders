@@ -1,15 +1,11 @@
 package org.ladders.services;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 
-import org.ladders.db.DataStorage;
 import org.ladders.util.Cols;
 import org.ladders.util.JsonUtil;
-import org.ladders.util.TimestampLogger;
 
 import com.mongodb.BasicDBObject;
-import com.sun.net.httpserver.HttpExchange;
 
 public class DeleteHandler extends BaseHandler2 {
  

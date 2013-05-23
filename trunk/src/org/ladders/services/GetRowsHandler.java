@@ -54,7 +54,7 @@ public class GetRowsHandler extends BaseHandler2 {
 		ArrayList<BasicDBObject> allRows = dao.getRows(criteria, fields);
 		tsLogger.log("Got-" + allRows.size() + "-rows");
 		
-		ArrayList<BasicDBObject> allParentRows = new ArrayList<>();
+		ArrayList<BasicDBObject> allParentRows = new ArrayList<BasicDBObject>();
 		if (allRows.size()>0){
 			HashSet<String> grandpaIds = getUniqueVals(Cols.GRANDPAID, allRows);
 			if (inputParams.containsKey("INCLUDE_PARENTS")) 
@@ -78,7 +78,7 @@ public class GetRowsHandler extends BaseHandler2 {
 	}
 
 	private static HashSet<String> getUniqueVals(String fld, ArrayList<BasicDBObject> allRows) {
-		HashSet<String> ids = new HashSet<>();
+		HashSet<String> ids = new HashSet<String>();
 		for (BasicDBObject dbObj : allRows) {
 			String pid = dbObj.getString(fld);
 			if (pid == null)

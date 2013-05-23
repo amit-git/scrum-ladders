@@ -1,9 +1,7 @@
 package org.ladders.db;
 
-import java.io.File;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -45,7 +43,7 @@ public class DataStorage {
 	private DBCollection rowsTable = null;
 	private DBCollection settTable = null;
 
-	private static HashMap<String, DataStorage> pool = new HashMap<>();
+	private static HashMap<String, DataStorage> pool = new HashMap<String, DataStorage>();
 
 	//No locking. Worst case we will get 2 instances. We can prime it later if it becomes a big problem.
 	public static DataStorage get(String ladderName) throws Exception {
@@ -55,7 +53,7 @@ public class DataStorage {
 	}
 
 	public static void reset() throws Exception {
-		pool = new HashMap<>();
+		pool = new HashMap<String, DataStorage>();
 	}
 
 	public static List<String> getAllLadders() throws Exception {
@@ -164,8 +162,8 @@ public class DataStorage {
 		cursor.sort(new BasicDBObject(Cols.PRIORITY, 1).append(Cols.CREATED_DATE, 1));
 		cursor.limit(U.MAX_ROWS);
 
-		ArrayList<BasicDBObject> arr = new ArrayList<>();
-		ArrayList<BasicDBObject> badArr = new ArrayList<>();
+		ArrayList<BasicDBObject> arr = new ArrayList<BasicDBObject>();
+		ArrayList<BasicDBObject> badArr = new ArrayList<BasicDBObject>();
 
 		while (cursor.hasNext()) {
 			BasicDBObject row = (BasicDBObject) cursor.next();
@@ -284,7 +282,7 @@ public class DataStorage {
 				rollupMap = (HashMap<String, String>) rollupToRow.get(k);
 				//U.log(k + " - rollupMap:" + rollupMap);
 			} else {
-				rollupMap = new HashMap<>();
+				rollupMap = new HashMap<String, String>();
 			}
 
 			String v = pair.getValue();
@@ -491,7 +489,7 @@ public class DataStorage {
 		rowsTable.remove(row);
 
 		// Now update the rollups
-		HashMap<String, String> params = new HashMap<>();
+		HashMap<String, String> params = new HashMap<String, String>();
 		for (Entry<String, Object> pair : row.entrySet()) {
 			if (pair.getKey().startsWith("_"))
 				continue;

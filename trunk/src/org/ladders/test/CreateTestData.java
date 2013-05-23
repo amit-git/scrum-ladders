@@ -3,7 +3,6 @@ package org.ladders.test;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 
 import org.ladders.db.DataStorage;
 import org.ladders.util.Cols;
@@ -17,7 +16,7 @@ public class CreateTestData {
 		return Min + (int) (Math.random() * ((Max - Min) + 1));
 	}
 
-	static ArrayList<String> printableChars = new ArrayList();
+	static ArrayList<String> printableChars = new ArrayList<String>();
 	static {
 		for (char i = 'A'; i <= 'Z'; i++)
 			printableChars.add(Character.toString(i));
@@ -65,7 +64,7 @@ public class CreateTestData {
 		//delete all first
 		ArrayList<BasicDBObject > rows = null;
 		do{
-			HashSet<String> types = new HashSet<>();
+			HashSet<String> types = new HashSet<String>();
 			types.add("Project");types.add("Epic");types.add("Story");types.add("Task");
 			rows = DataStorage.get(LADDER_NAME).getRows(Cols.ROWTYPE, types);
 			for(BasicDBObject row : rows){
