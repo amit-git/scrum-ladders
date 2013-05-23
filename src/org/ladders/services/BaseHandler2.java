@@ -1,10 +1,18 @@
 package org.ladders.services;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URLDecoder;
 import java.net.UnknownHostException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 
 import org.apache.commons.lang3.StringUtils;
@@ -19,7 +27,6 @@ import org.ladders.util.U;
 
 import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpExchange;
-import com.sun.net.httpserver.HttpHandler;
 import com.sun.xml.internal.fastinfoset.stax.events.Util;
 
 public abstract class BaseHandler2 {
@@ -31,7 +38,7 @@ public abstract class BaseHandler2 {
 	private HttpExchange exchange;
 	protected String ladderName;
 	protected TimestampLogger tsLogger;
-	HashMap<String, String> inputParams = new HashMap<>();
+	HashMap<String, String> inputParams = new HashMap<String, String>();
 	protected String rowType;
 	protected String parentId;
 	protected DataStorage dao = null;
@@ -298,7 +305,7 @@ public abstract class BaseHandler2 {
 
 	public static String fetchWidgets(String indexHtml) throws IOException {
 
-		ArrayList<File> paths = new ArrayList<>();
+		ArrayList<File> paths = new ArrayList<File>();
 		File file = new File(U.startPath("STATIC\\WIDGET"));
 		FileUtil.readAllChildren(file, paths);
 

@@ -11,7 +11,7 @@ import org.json.JSONWriter;
 import com.mongodb.BasicDBObject;
 
 public class JsonUtil {
-	private static HashSet<String> dontSendList = new HashSet<>();
+	private static HashSet<String> dontSendList = new HashSet<String>();
 	static {
 		dontSendList.add("_createdDate");
 		dontSendList.add("_updateDate");
@@ -54,7 +54,7 @@ public class JsonUtil {
 	}
 
 	private static HashMap<String, Double> convertToRollup(Object mapObj) {
-		HashMap<String, Double> retMap = new HashMap<>();
+		HashMap<String, Double> retMap = new HashMap<String, Double>();
 		HashMap<String, String> rollupMap = (HashMap<String, String>) mapObj;
 		for (Entry<String, String> pair : rollupMap.entrySet()) {
 			String v = pair.getValue();

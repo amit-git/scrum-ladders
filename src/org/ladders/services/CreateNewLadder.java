@@ -53,7 +53,7 @@ public class CreateNewLadder extends BaseHandler2 {
 
 		LaddersContextModel context = contextQ.get(i);
 
-		ArrayList<String> addedRows = new ArrayList<>();
+		ArrayList<String> addedRows = new ArrayList<String>();
 		for (int j = 0; j < TOTAL_TEST_ROWS; j++) {
 			String rowId = insertRow(j, ladderName, context, parentId);
 			addedRows.add(rowId);
