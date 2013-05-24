@@ -26,15 +26,9 @@ import com.mongodb.MongoClientURI;
 import com.mongodb.WriteResult;
 import com.sun.xml.internal.fastinfoset.stax.events.Util;
 
-class TransactionStatus1 {
-	public String json;
-	public int updateCount;
-	public BasicDBObject row;
-}
 
 public class DataStorage {
 
-	//private static final String TEXT_URI = "mongodb://localhost:27017/test";
 	private static String dbUrl = null;
 	private static final String SETTINGS_TABLE = "SettingsTable3";
 	private static final String ROWS_TABLE = "RowsTable3";
@@ -44,6 +38,7 @@ public class DataStorage {
 	private DBCollection settTable = null;
 
 	private static HashMap<String, DataStorage> pool = new HashMap<String, DataStorage>();
+	private RollupsManager rollupsManager = null;
 
 	//No locking. Worst case we will get 2 instances. We can prime it later if it becomes a big problem.
 	public static DataStorage get(String ladderName) throws Exception {
@@ -108,6 +103,8 @@ public class DataStorage {
 			BasicDBObject query = new BasicDBObject(Cols.PARENTID, 1);
 			rowsTable.ensureIndex(query, "_parent_sort");
 		}
+		
+		rollupsManager = new RollupsManager(this, rowsTable);
 	}
 
 	/*
@@ -226,6 +223,25 @@ public class DataStorage {
 			settTable.insert(newVal);
 		}
 	}
+	public void move(String rowId, String newParentId) throws Exception {
+		BasicDBObject moveThisRow = getRow(rowId);
+		BasicDBObject newParentRow = getRow(newParentId);
+
+		if (moveThisRow == null){
+			throw new Exception("Row to move "+ rowId+ " doesn't exist");
+		}
+		if (newParentRow == null){
+			throw new Exception("New Parent "+newParentId+ " doesn't exist");
+		}
+
+		if (moveThisRow.getString(Cols.PARENTID).equals(newParentId)){
+			throw new Exception(rowId+ " is already in the parent "+newParentId);
+		}
+
+		rollupsManager.moveRollup(moveThisRow, newParentRow);
+		moveThisRow.put(Cols.PARENTID, newParentId);
+		moveThisRow.put(Cols.PARENTID, newParentId);
+	}
 
 	public String update(HashMap<String, String> params) throws Exception {
 
@@ -249,96 +265,12 @@ public class DataStorage {
 		rowsTable.update(new BasicDBObject(Cols.ROWID, _rowId), row);
 
 		// Now update the rollups
-		updateRollups(row, params, 0);
+		rollupsManager.updateRollups(row, params);
 
 		return row.toString();
 	}
 
-	private void updateRollups(final BasicDBObject row, HashMap<String, String> params, final int rollupLevel)
-			throws Exception {
 
-		String rollupToId = null;
-		BasicDBObject rollupToRow = row;
-		for (int i = 0; i <= rollupLevel; i++) {
-			rollupToId = rollupToRow.getString(Cols.PARENTID);
-			rollupToRow = getRow(rollupToId);
-			if (rollupToRow == null)
-				return;
-		}
-
-		String rowId = row.getString(Cols.ROWID);
-		//U.log(" FOR rollupToId:" + rollupToId);
-		// 0:1,5:1,10:1
-		// Multilevel rollups ,ST111:Dev1,ST111:Dev2,ST222:Dev3
-		for (Entry<String, String> pair : params.entrySet()) {
-			String k = pair.getKey();
-			if (k.startsWith("_"))
-				continue;
-
-			k = Cols.ROLLUP_PREFIX + k;
-
-			HashMap<String, String> rollupMap = null;
-			if (rollupToRow.containsField(k)) {
-				rollupMap = (HashMap<String, String>) rollupToRow.get(k);
-				//U.log(k + " - rollupMap:" + rollupMap);
-			} else {
-				rollupMap = new HashMap<String, String>();
-			}
-
-			String v = pair.getValue();
-
-			if (v == null) {
-				// Delete this entry from the rollup. His ass got deleted.
-				rollupMap.remove(rowId);
-			} else {
-				if (v.length() >= 20)
-					v = v.substring(0, 20);
-				rollupMap.put(rowId, v); // ST111:5
-			}
-
-			// Replace it back
-			rollupToRow.put(k, rollupMap);
-		}
-
-		rowsTable.update(new BasicDBObject(Cols.ROWID, rollupToId), rollupToRow);
-
-		// Rollup more.
-		updateRollups(row, params, rollupLevel + 1);
-	}
-
-	/*
-	private void updateRollups(BasicDBObject row, HashMap<String, String> params) throws Exception {
-
-		HashSet<String> rollupKeys = new HashSet<>();
-		for (Entry<String, String> pair : params.entrySet()) {
-			String k = pair.getKey();
-			String v = pair.getValue();
-			double doubleVal = U.tryParse(v);
-			if (doubleVal != 0) {
-				rollupKeys.add(k);
-			}
-		}
-		
-		String parentId = row.getString(Cols.PARENTID);
-
-		// get all siblings
-		ArrayList<BasicDBObject> siblings = getRows(new BasicDBObject(Cols.PARENTID, parentId));
-		for (final String key : rollupKeys) {
-			double total = 0;
-			for (final BasicDBObject sibling : siblings) {
-				double d = U.tryParse( sibling.getString(key) );
-				total += d;
-			}// siblings
-
-			// update parent for this rollup
-			BasicDBObject parentRow = getRow(parentId);
-			parentRow.put("_ROLLUP_" + key, "" + total);
-			rowsTable.update(new BasicDBObject(Cols.ROWID, parentId), parentRow);
-
-		}// for rollupKey
-
-	}//updateRollups()
-	*/
 
 	private void indexBy(String key) {
 		// Index by field
@@ -456,7 +388,7 @@ public class DataStorage {
 		rowsTable.save(row);
 
 		// Now update the rollups
-		updateRollups(row, params, 0);
+		rollupsManager.updateRollups(row, params);
 
 		return row;
 	}// insert
@@ -495,7 +427,7 @@ public class DataStorage {
 				continue;
 			params.put(pair.getKey(), null);
 		}
-		updateRollups(row, params, 0);
+		rollupsManager.updateRollups(row, params);
 
 		ArrayList<BasicDBObject> rows = new ArrayList<BasicDBObject>();
 		rows.add(row);
