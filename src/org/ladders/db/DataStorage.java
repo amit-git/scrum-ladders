@@ -293,13 +293,13 @@ public class DataStorage {
 			throw new Exception("BAD ROW _rowId:" + _rowId + " _parentId:" + _parentId);
 
 		if (!row.containsField(Cols.ROWTYPE)) {
-			throw new Exception(Cols.ROWTYPE + " must exist in the row:" + JsonUtil.toJsonFromRaw(row));
+			throw new Exception(Cols.ROWTYPE + " must exist in the row:" + row.toString());
 		}
 		if (!row.containsField(Cols.PRIORITY)) {
-			throw new Exception(Cols.PRIORITY + " must exist in the row:" + JsonUtil.toJson(row));
+			throw new Exception(Cols.PRIORITY + " must exist in the row:" + row.toString());
 		}
 		if (!row.containsField(Cols.GRANDPAID)) {
-			throw new Exception(Cols.GRANDPAID + " must exist in the row:" + JsonUtil.toJson(row));
+			throw new Exception(Cols.GRANDPAID + " must exist in the row:" + row.toString());
 		}
 
 	}
