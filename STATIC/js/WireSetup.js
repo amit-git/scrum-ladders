@@ -12,14 +12,16 @@ $( document ).ready(function() {
 });
 	
 var wirePage = function(){
-	ENV.dbWidget = new Widget.DBConnectionWidget();
-	ENV.dbWidget.render ($("#dbconnectionDiv"));
+	//ENV.dbWidget = new Widget.DBConnectionWidget();
+	//ENV.dbWidget.render ($("#dbconnectionDiv"));
 
 	loadAllLadders();
+	/*
 	ENV.dbWidget.getEventManager().attachEvent("save", loadAllLadders);
 	ENV.dbWidget.getEventManager().attachEvent("loading", function(){
 		$("#laddersListDiv").html("...loading");
 	});
+	*/
 	
 };//wirePage
 	
@@ -27,7 +29,7 @@ var loadAllLadders = function(){
 	SERVER.getAllLadders(function(list){
 		$("#errorHead").html("");
 
-		ENV.laddersWidget = new Widget.LaddersListWidget(list, $("#errorHead"));
+		ENV.laddersWidget = new Widget.LaddersListWidget2(list, $("#errorHead"));
 		ENV.laddersWidget.render ($("#laddersListDiv"));
 
 	}, function(err){

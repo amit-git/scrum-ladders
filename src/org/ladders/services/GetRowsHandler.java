@@ -1,75 +1,83 @@
 package org.ladders.services;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
 
 import org.apache.commons.lang3.StringUtils;
-import org.ladders.db.DataStorage;
+import org.ladders.db.AbstractDataStorage;
+import org.ladders.db.LadderFactory;
+import org.ladders.db.MyRecord;
 import org.ladders.util.Cols;
 import org.ladders.util.JsonUtil;
+import org.ladders.util.U;
 
-import com.mongodb.BasicDBList;
-import com.mongodb.BasicDBObject;
-import com.mongodb.DBObject;
-
-public class GetRowsHandler extends BaseHandler2 {
-	
+public class GetRowsHandler extends BaseHandler
+{
 
 	@Override
-	protected void innerHandle() throws Exception {
-		if (StringUtils.isEmpty(rowType))
-			throw new Exception("No rowType identified");		
-		
+	protected void innerHandle() throws Exception
+	{
+
+		String[] fieldsList = null;
+		if (inputParams.containsKey("FIELDS"))
+		{
+			fieldsList = inputParams.get("FIELDS").split(",");
+			//U.log("fieldsList:"+inputParams.get("FIELDS"));
+		}
+		AbstractDataStorage dao = LadderFactory.getLadder(this.getLadderName());
+
+		ArrayList<MyRecord> allRows = null;
 		// AND:f1=20,f2=40,f3=dddd
-		BasicDBObject criteria = new BasicDBObject();
-		if (inputParams.containsKey("AND")) {
+		if (inputParams.containsKey("AND"))
+		{
+			assertTrue(false, "AND Not supported now");
+			/*
+			HashMap<String, String> andPairs = new HashMap<String, String>();
+
 			String andParams = inputParams.get("AND");
-			for (String cond : andParams.split(",")) {
+			for (String cond : andParams.split(","))
+			{
 				String[] pair = splitPair(cond, ":");
 				if (pair.length != 2)
 					continue;
-				criteria.append(pair[0], pair[1]);
+				andPairs.put(pair[0], pair[1]);
 			}// for p
-		} else if (inputParams.containsKey("IN")) {
+			allRows = dao.getRows(andPairs, fieldsList);
+			*/
+		} else if (inputParams.containsKey("IN"))
+		{
 			String inParams = inputParams.get("IN");
 			String[] pair = splitPair(inParams, ":");
 
-			// BasicDBObject criteria = new BasicDBObject(fieldName, inClause);
-			BasicDBList docIds = new BasicDBList();
-			for (String v : pair[1].split(",")) {
-				docIds.add(v);
-			}
-			DBObject inClause = new BasicDBObject("$in", docIds);
-			criteria.append(pair[0], inClause);
-		}
-
-		BasicDBObject fields = null;
-		if (inputParams.containsKey("FIELDS")) {
-			fields = new BasicDBObject();
-			for (String field : inputParams.get("FIELDS").split(",")){
-				fields.put(field, 1);
-			}
-		}
-
-		ArrayList<BasicDBObject> allRows = dao.getRows(criteria, fields);
-		tsLogger.log("Got-" + allRows.size() + "-rows");
-		
-		ArrayList<BasicDBObject> allParentRows = new ArrayList<BasicDBObject>();
-		if (allRows.size()>0){
-			HashSet<String> grandpaIds = getUniqueVals(Cols.GRANDPAID, allRows);
-			if (inputParams.containsKey("INCLUDE_PARENTS")) 
+			String[] docIdList = pair[1].split(",");
+			HashSet<String> h = new HashSet<String>(Arrays.asList(docIdList));
+			allRows = dao.getRows(pair[0], h, fieldsList);
+		}else{
+			HashMap<String, String> andPairs = new HashMap<String, String>();
+			andPairs.put(Cols.ROWTYPE, this.rowType);
+			
+			for (String key : inputParams.keySet())
 			{
-				allParentRows = dao.getRows(Cols.PARENTID, grandpaIds);
-				if (allParentRows.size()==0){
-					allParentRows.add(dao.getRow(parentId));
-				}
-				tsLogger.log("Got-" + allParentRows.size() + "-Parents");
-			}
+				andPairs.put(key, inputParams.get(key));
+			}// for p
+			
+			allRows = dao.getRows(andPairs, fieldsList);
+		}
+
+		//U.log("Got-" + allRows.size() + "-rows");
+
+		ArrayList<MyRecord> allParentRows = new ArrayList<MyRecord>();
+		if (allRows.size() > 0)
+		{
+			//Get parent name  _PARENT_DESCRIPTION
+			fillParentDescriptions(allRows);
 		}
 
 		StringBuffer buf1 = new StringBuffer("{");
-		buf1.append("Rows:").append(JsonUtil.toJson(allRows));
-		buf1.append(",\n\nParentRows:").append(JsonUtil.toJson(allParentRows));
+		buf1.append("Rows:").append(JsonUtil.toJsonFromRaw(allRows));
+		buf1.append(",\n\nParentRows:").append(JsonUtil.toJsonFromRaw(allParentRows));
 		buf1.append("}");
 
 		tsLogger.log("Jsonified");
@@ -77,20 +85,48 @@ public class GetRowsHandler extends BaseHandler2 {
 		successOut("Got rows", buf1.toString());
 	}
 
-	private static HashSet<String> getUniqueVals(String fld, ArrayList<BasicDBObject> allRows) {
+	private static HashSet<String> getUniqueVals(String fld, ArrayList<MyRecord> allRows) throws Exception
+	{
 		HashSet<String> ids = new HashSet<String>();
-		for (BasicDBObject dbObj : allRows) {
+		for (MyRecord dbObj : allRows)
+		{
 			String pid = dbObj.getString(fld);
 			if (pid == null)
 				continue;
+			
 			ids.add(pid);
 		}
 		return ids;
 	}// getAllParentIds()
 
+	private void fillParentDescriptions(ArrayList<MyRecord> allRows) throws Exception
+	{
+		HashSet<String> parentIds = getUniqueVals(Cols.PARENTID, allRows);
+		
+		AbstractDataStorage dao = LadderFactory.getLadder(this.getLadderName());
+		
+		ArrayList<MyRecord> allParentRows = dao.getRows(Cols.ROWID, parentIds, new String[] { Cols.ROWID, Cols.DESCRIPTION });
+
+		HashMap<String, String> descriptions = new HashMap<String, String>();
+		for (MyRecord rec : allParentRows)
+		{
+			//U.log("PARENTS fillParentDescriptions: "+rec);
+			descriptions.put(rec.getString(Cols.ROWID), rec.getString(Cols.DESCRIPTION));
+		}
+		
+		for (MyRecord rec : allRows)
+		{
+			String parentId = rec.getString(Cols.PARENTID);
+			rec.put(Cols._PARENT_DESCRIPTION, descriptions.get(parentId));
+			//U.log("CHILD fillParentDescriptions: "+rec);
+		}
+	}
+
+
 	@Override
-	public String getName() {
-		return "ROWS";
+	protected boolean actionOnLadder()
+	{
+		return true;
 	}
 
 }

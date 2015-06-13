@@ -1,77 +1,57 @@
 [
- {
-	Name: "Project",
-	Schema: [
-		{
-			Name:"Description",
-			Validation: "regex('[a-z]+')",
-			MaxLen: 100,
-			MinLen: 2
-		},
-		
-		{
-			Name:"Product_Owner",
-			Args: ["Product Manager 1", "Product Manager 2", "Product Manager 3", "Product Manager 4", "Product Manager 5"]
-		}	
-		
-	]
-},
-
-{
-	Name: "Epic",
-	Schema: [
-		{
-			Name:"Description",
-			Validation: "regex('[a-z]+')"
-		},
-
-		{
-			Name:"Epic_Owner",
-			Args: ["TPM 1", "TPM 2", "TPM 3", "TPM 4", "TPM 5"],
-			RollsUp: "group"
-		},
-		{
-			Name:"Low_Estimate",
-			Args: [ 250, 400, 650, 1000],
-			RollsUp: "sum"
-		},
-		
-		{
-			Name:"High_Estimate",
-			Args: [250, 400, 650, 1000],
-			RollsUp: "sum"
-		}		
-	]
-},
 {
 	Name: "Story",
 	Schema: [
 		{
 			Name:"Description",
-			Validation: "regex('[a-z]+')",
+			ColumnType:"Text",
 			MaxLen: 100,
 			MinLen: 2
 		},
 		{
+	        Name: "Comments",
+	        ColumnType: "Notes"
+	    },
+		{
 			Name:"Story_Owner",
-			Args: ["Dev 1", "Dev 2", "Dev 3", "Dev 4", "Dev 5"],
-			RollsUp: "group"
+			ColumnType:"Select",
+			Args: ["Dev 1", "Dev 2", "Dev 3", "Dev 4", "Dev 5"]
 		},
 		{
 			Name:"Team",
+			ColumnType:"Select",
 			Args: ["Unassigned", "UI Team", "Backend Team"]
 		},
 		
 		{
 			Name:"Sprint",
+			ColumnType:"Select",
 			Args: ["Backlog", "Jan 2013", "Feb 2013", "Mar 2013", "Apr 2013", "May 2013"]
 		},
-		 
+
 		{
 			Name:"Story_Points",
-			Args: [3, 5, 8, 10, 15, 20, 25],
-			RollsUp: "sum"
+			ColumnType:"Select",
+			Args: [3, 5, 8, 10, 15, 20, 25]
+		},
+
+		{
+			Name:"Total_Task_Points",
+			ColumnType:"Rollup",
+			RollupTarget: "Task",
+			RollupColumn: "Task_Points",
+			RollupType: "sum"
+		},
+
+		{
+			Name:"Status_rollup",
+			ColumnType:"Rollup",
+			RollupTarget: "Task",
+			RollupColumn: "Status",
+			RollupType: "group",
+			RollupSumColumn:"Task_Points"
 		}
+
 	]
 },
 
@@ -80,27 +60,27 @@
 	Schema: [
 		{
 			Name:"Description",
-			Validation: "regex('[a-z]+')",
+			ColumnType:"Text",
 			MaxLen: 100,
 			MinLen: 2
 		},
 
 		{
 			Name:"Task_Owner",
-			Args: ["Dev 1", "Dev 2", "Dev 3", "Dev 4", "Dev 5"],
-			RollsUp: "group"
+			ColumnType:"Select",
+			Args: ["Dev 1", "Dev 2", "Dev 3", "Dev 4", "Dev 5"]
 		},
  
 		{
 			Name:"Task_Points",
-			Args: [1, 2, 3, 5, 8, 13],
-			RollsUp: "sum"
+			ColumnType:"Select",
+			Args: [1, 2, 3, 5, 8, 13]
 		},
 		{
 			Name:"Status",
+			ColumnType:"Select",
 			Args: ["Open", "Closed", "Blocked" ],
-			Colors: ["#FFFFFF", "#88FF88", "#FF8888" ],
-			RollsUp: "group"
+			Colors: ["#FFFFFF", "#88FF88", "#FF8888" ]
 		} 
 	]
 }

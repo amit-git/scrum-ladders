@@ -2,12 +2,13 @@ package org.ladders.services;
 
 import java.util.ArrayList;
 
+import org.ladders.db.AbstractDataStorage;
+import org.ladders.db.LadderFactory;
+import org.ladders.db.MyRecord;
 import org.ladders.util.Cols;
 import org.ladders.util.JsonUtil;
 
-import com.mongodb.BasicDBObject;
-
-public class DeleteHandler extends BaseHandler2 {
+public class DeleteHandler extends BaseHandler {
  
 
 	@Override
@@ -16,20 +17,19 @@ public class DeleteHandler extends BaseHandler2 {
 			throw new Exception("No _rowId defined");
 		}
 		String id = inputParams.get(Cols.ROWID);
-		ArrayList<BasicDBObject> rows = dao.delete(id);
+		
+		AbstractDataStorage dao = LadderFactory.getLadder(this.getLadderName());
+
+		ArrayList<MyRecord > rows = dao.delete(id);
 		//successOut("Delete Success "+id, rows);
-		successOut("Got rows", JsonUtil.toJson(rows).toString());
+		successOut("Got rows", JsonUtil.toJsonFromRaw(rows).toString());
 
 	}
-
+ 
 	@Override
-	public String getName() {
-		return "DELETE";
+	protected boolean actionOnLadder()
+	{
+		return true;
 	}
-
-
- 
-	 
- 
 
 }

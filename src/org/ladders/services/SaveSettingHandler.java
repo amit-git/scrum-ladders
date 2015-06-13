@@ -3,10 +3,10 @@ package org.ladders.services;
 import org.apache.commons.lang3.StringUtils;
 import org.ladders.util.SettingsUtil;
 
-public class SaveSettingHandler extends BaseHandler2 {
+public class SaveSettingHandler extends BaseHandler {
  
 	@Override
-	public boolean isTransactional() {
+	public boolean actionOnLadder() {
 		return false;
 	}
 
@@ -32,11 +32,7 @@ public class SaveSettingHandler extends BaseHandler2 {
 		SettingsUtil.saveSetting(name, text);
 		successOut("Saved", "");
 	}
-
-	@Override
-	public String getName() {
-		return "SAVESETTING";
-	}
+ 
 
  
 	 

@@ -3,10 +3,10 @@ package org.ladders.services;
 import org.apache.commons.lang3.StringUtils;
 import org.ladders.util.SettingsUtil;
 
-public class GetSettingHandler extends BaseHandler2 {
+public class GetSettingHandler extends BaseHandler {
  
 	@Override
-	public boolean isTransactional() {
+	public boolean actionOnLadder() {
 		return false;
 	}
 
@@ -22,12 +22,7 @@ public class GetSettingHandler extends BaseHandler2 {
 		String txt = SettingsUtil.getSetting(name);
 		successOut(name, txt);
 	}
-
-	@Override
-	public String getName() {
-		return "GETSETTING";
-	}
-
+ 
  
 	 
  

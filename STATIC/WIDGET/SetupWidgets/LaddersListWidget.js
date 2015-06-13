@@ -4,7 +4,7 @@ Widget.LaddersListWidget = function(mapLadders, errorDiv){
 	var listLadders = [];
 	for (var name in mapLadders) listLadders.push(name);
 
-	var renderLadder = function(htm, name, schemaid, saveid, openid){
+	var renderLadder = function(htm, name, schemaid, saveid, openid, deleteid){
 		htm.push("<td>");
 		htm.push(name);
 		htm.push("</td>");
@@ -17,6 +17,9 @@ Widget.LaddersListWidget = function(mapLadders, errorDiv){
 		htm.push("</td>");
 		htm.push("<td>");
 		htm.push("<button class='ld_link' id='"+openid+"'>Open LADDER</button>");
+		htm.push("</td>");
+		htm.push("<td>");
+		htm.push("<button class='ld_link' id='"+deleteid+"'>Delete LADDER</button>");
 		htm.push("</td>");
 	}
 	
@@ -45,7 +48,8 @@ Widget.LaddersListWidget = function(mapLadders, errorDiv){
 			var schemaid='schemalink'+i;
 			var saveid='savelink'+i;
 			var openid='openlink'+i;
-			renderLadder (htm, listLadders[i], schemaid, saveid, openid);
+			var deleteid = 'deletelink'+i;
+			renderLadder (htm, listLadders[i], schemaid, saveid, openid, deleteid);
 			htm.push("</tr>");
 		}//for i
 
@@ -97,13 +101,26 @@ Widget.LaddersListWidget = function(mapLadders, errorDiv){
 		);
  
 		
-	};//addNewLadder()
+	};//saveLadder()
 	
-	
+	var deleteLadder = function(name){
+		
+		SERVER.deleteLadder(name, 
+			function(data){
+				location.reload(false);
+			}, 
+			function(errmsg, data){
+				alert("ERROR in LADDER deletion ");
+			} 
+		);
+ 
+		
+	};//deleteLadder()	
 	var attachLoadSchema = function (i, name){
 		var schemaid='schemalink'+i;
 		var saveid='savelink'+i;
 		var openid='openlink'+i;
+		var deleteid = 'deletelink'+i;
 
 		$("#"+schemaid).click(function(){
 			var schemaJs = mapLadders[name];
@@ -118,7 +135,13 @@ Widget.LaddersListWidget = function(mapLadders, errorDiv){
 		$("#"+openid).click(function(){
 			var schemaObj = eval(mapLadders[name]);
 			window.open("/D/"+name+"/AND:_rowType:"+schemaObj[0].Name, "_blank");
-		});		
+		});
+		
+		$("#"+deleteid).click(function(){
+			deleteLadder(name);
+
+		});
+		
 	};
 }; //AddNewActionWidget()
  

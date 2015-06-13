@@ -3,11 +3,48 @@
 }
 .nobr	{ white-space:nowrap; }
 
+
+
 .ld_body {
 	font-family: "lucida grande", tahoma, verdana, arial, sans-serif;
 	font-size: 11px;
 	color: #333333;
+	
+    vertical-align: middle;
+	text-align:center; 
+	
 }
+
+.main_content_div{
+    width:500px;
+    margin:0px auto;
+    text-align:left;
+    padding:15px;
+}
+.overall_page_action{
+	font-size: 12px;
+	font-weight: bold;
+	cursor: hand;
+	cursor: pointer;
+	white-space:nowrap;
+	margin-top:20px;
+	text-align:center;
+	padding:5px;
+}
+.item_action{
+	color: #3b5998;
+	outline-style: none;
+	font-size: 11px;
+	font-weight: normal;
+	text-decoration: underline;
+	cursor: hand;
+	cursor: pointer;
+	white-space:nowrap;
+	margin:10px;
+	padding-left:20px;
+	padding-right:20px;
+}
+
 
 .ld_link {
 	color: #3b5998;
@@ -17,29 +54,43 @@
 	text-decoration: underline;
 	cursor: hand;
 	cursor: pointer;
+	white-space:nowrap;
 }
 
-/* Default Anchor Style */
-.ld_body a {
-	color: #3b5998;
-	outline-style: none;
-	text-decoration: none;
-	font-size: 11px;
-	font-weight: bold;
+.paddingleftright {
+	padding-left:5px;
+	padding-right:15px;
 }
+
 
 .ld_body a:hover {
 	text-decoration: underline;
 }
 
-.rollupSummaryTab {
+.top_menu_table{
 	background-color: #f7f7f7;
-	border: 1px solid #cccccc;
+	border: 1px solid black;
 	color: #333333;
-	padding: 10px;
-	font-size: 10px;
-	font-weight: normal;
+	padding: 7px;
+	font-family:Helvetica Neue, Helvetica, Arial, sans-serif;
+	text-shadow: rgba(0,0,0,.01) 0 0 1px;
+	font-size: 16px;
+	font-weight: bold;
 	text-align: center;
+	cursor: hand;
+	cursor: pointer;
+	text-decoration: none;
+}
+
+
+.HomeMenuLinksStyle{
+	background-color: #152227;
+	border: 1px solid #cccccc;
+	color: #FFFFFF;
+	padding: 10px;
+	font-size: 11px;
+	font-weight: bolder;
+	text-align: left;
 }
 
 .ld_bluebox {
@@ -103,6 +154,14 @@
 	background-color: #d8dfea;
 }
 
+.RollupSummaryStyle{
+    position: absolute;
+    top: 2px;
+    right: 2px;
+	background-color: #d8dfea;
+	font-size:xx-small;
+}
+
 .menuSectionStyle {
 	margin-top: 1px;
 	margin-bottom: 1px;
@@ -122,6 +181,7 @@
 	margin-right: 4px;
 	text-decoration: none;
 	font-size: 11px;
+	
 }
 
 .ld_tab a {

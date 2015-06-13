@@ -5,21 +5,21 @@ import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.json.JSONStringer;
 import org.json.JSONWriter;
-import org.ladders.db.DataStorage;
+import org.ladders.db.LadderFactory;
 import org.ladders.util.SettingsUtil;
 
-public class GetLaddersHandler extends BaseHandler2 {
+public class GetLaddersHandler extends BaseHandler {
 
 	@Override
 	protected void innerHandle() throws Exception {
 
-		List<String> ladders = DataStorage.getAllLadders();
+		List<String> ladders = LadderFactory.getAll();
 
 		JSONWriter map = new JSONStringer();
 		map.object();
 
 		for (String s : ladders) {
-			String js = SettingsUtil.getSetting("SCHEMA_"+s);
+			String js = LadderFactory.getSchema(s);
 			if (!StringUtils.isEmpty(js)){
 				map.key(s).value(js);
 			}
@@ -29,14 +29,10 @@ public class GetLaddersHandler extends BaseHandler2 {
 		successOut("Got Ladders", map.toString());
 
 	}
+ 
 
 	@Override
-	public String getName() {
-		return "GETLADDERS";
-	}
-
-	@Override
-	public boolean isTransactional() {
+	public boolean actionOnLadder() {
 		return false;
 	}
 
