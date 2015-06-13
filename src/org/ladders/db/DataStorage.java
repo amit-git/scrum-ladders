@@ -24,7 +24,6 @@ import com.mongodb.DBObject;
 import com.mongodb.MongoClient;
 import com.mongodb.MongoClientURI;
 import com.mongodb.WriteResult;
-import com.sun.xml.internal.fastinfoset.stax.events.Util;
 
 
 public class DataStorage {
@@ -68,7 +67,7 @@ public class DataStorage {
 			dbUrl = FileUtil.readTextFromTile( U.startPath("/STATIC/SETTINGS/DBConnection.txt"));
 			dbUrl = dbUrl.trim();
 		}
-		if (Util.isEmptyString(dbUrl)){
+		if (dbUrl == null || dbUrl.isEmpty()){
 			throw new Exception("Database Connection not specified");
 		}else{
 			U.log("validateDbConnection URL:"+dbUrl);
@@ -76,7 +75,7 @@ public class DataStorage {
 	}	
 	private DataStorage(String ladderName) throws Exception {
 		validateDbConnection();
-		if (Util.isEmptyString(ladderName)){
+		if (ladderName == null || ladderName.isEmpty()){
 			throw new Exception("LADDER can't be null");
 		}
 		
@@ -294,7 +293,7 @@ public class DataStorage {
 			throw new Exception("BAD ROW _rowId:" + _rowId + " _parentId:" + _parentId);
 
 		if (!row.containsField(Cols.ROWTYPE)) {
-			throw new Exception(Cols.ROWTYPE + " must exist in the row:" + JsonUtil.toJson(row));
+			throw new Exception(Cols.ROWTYPE + " must exist in the row:" + JsonUtil.toJsonFromRaw(row));
 		}
 		if (!row.containsField(Cols.PRIORITY)) {
 			throw new Exception(Cols.PRIORITY + " must exist in the row:" + JsonUtil.toJson(row));

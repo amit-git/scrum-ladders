@@ -2,16 +2,7 @@ package org.ladders.main;
 
 import java.io.IOException;
 
-import org.ladders.services.BaseHandler2;
-import org.ladders.services.CreateNewLadder;
-import org.ladders.services.DeleteHandler;
-import org.ladders.services.GetLaddersHandler;
-import org.ladders.services.GetRowsHandler;
-import org.ladders.services.GetSettingHandler;
-import org.ladders.services.IndexHtmlHandler2;
-import org.ladders.services.InsertHandler;
-import org.ladders.services.SaveSettingHandler;
-import org.ladders.services.UpdateHandler;
+import org.ladders.services.*;
 
 import com.sun.net.httpserver.HttpHandler;
 

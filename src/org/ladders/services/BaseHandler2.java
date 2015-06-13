@@ -27,7 +27,6 @@ import org.ladders.util.U;
 
 import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpExchange;
-import com.sun.xml.internal.fastinfoset.stax.events.Util;
 
 public abstract class BaseHandler2 {
 
@@ -103,18 +102,18 @@ public abstract class BaseHandler2 {
 
 			String andVals = inputParams.get("AND");
 			if (!StringUtils.isEmpty(andVals)) {
-				if (Util.isEmptyString(rowType))
+				if (rowType == null || rowType.isEmpty())
 					rowType = RegUtil.match(andVals, "_rowType:([0-9a-zA-Z]+)");
 
-				if (Util.isEmptyString(parentId))
+				if (parentId == null || parentId.isEmpty())
 					parentId = RegUtil.match(andVals, "_parentId:([0-9a-zA-Z-]+)");
 			}
 
 			// U.log("inputParams.containsKey(" + Cols.ROWTYPE + "):" +
 			// inputParams.containsKey(Cols.ROWTYPE));
-			if (Util.isEmptyString(rowType) && inputParams.containsKey(Cols.ROWTYPE))
+			if ((rowType == null || rowType.isEmpty()) && inputParams.containsKey(Cols.ROWTYPE))
 				rowType = inputParams.get(Cols.ROWTYPE);
-			if (Util.isEmptyString(parentId) && inputParams.containsKey(Cols.PARENTID))
+			if ((parentId == null || parentId.isEmpty()) && inputParams.containsKey(Cols.PARENTID))
 				parentId = inputParams.get(Cols.PARENTID);
 
 			U.log("queryUrl: " + queryUrl);
@@ -238,7 +237,7 @@ public abstract class BaseHandler2 {
 	}
 
 	private boolean isString(String data) {
-		if (Util.isEmptyString(data)) {
+		if (data == null || data.isEmpty()) {
 			return false;
 		}
 		data = data.trim();
@@ -264,7 +263,7 @@ public abstract class BaseHandler2 {
 			}
 			myString.endObject();
 
-			if (Util.isEmptyString(data)) {
+			if (data == null || data.isEmpty()) {
 				data = "null";
 			}
 
@@ -340,14 +339,14 @@ public abstract class BaseHandler2 {
 
 		StringBuffer buf = new StringBuffer();
 
-		if (!Util.isEmptyString(rowType)) {
+		if (rowType != null && ! rowType.isEmpty()) {
 			buf.append(" ENV.RowType = '" + this.rowType + "';");
 		}
 
-		if (!Util.isEmptyString(ladderName)) {
+		if (ladderName != null && ! ladderName.isEmpty()) {
 			buf.append(" ENV.LadderName = '" + ladderName + "';");
 		}
-		if (!Util.isEmptyString(parentId)) {
+		if (parentId != null && !parentId.isEmpty()) {
 			buf.append(" ENV.ParentId = '" + parentId + "';");
 		}
 

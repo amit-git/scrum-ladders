@@ -1,0 +1,31 @@
+apply plugin: 'java'
+apply plugin: 'idea'
+apply plugin: 'eclipse'
+
+sourceSets {
+    main {
+        java {
+            srcDir 'src'
+        }
+        resources {
+            srcDir 'STATIC'
+        }
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile fileTree(dir: 'lib', include: '*.jar')
+    compile fileTree(dir: 'lib/Lucene', include: '*.jar')
+    compile fileTree(dir: 'lib/OrientDB', include: '*.jar')
+    compile 'org.eclipse.jetty:jetty-servlet:7.6.7.v20120910'
+
+    compile 'junit:junit:4.12' // should be testCompile
+}
+
+task list(dependsOn: configurations.compile) << {
+    println "classpath = ${configurations.compile.collect {File file -> file.name}}"
+}
