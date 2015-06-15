@@ -3,8 +3,6 @@ package org.ladders.util;
 import java.io.File;
 import java.io.IOException;
 
-import org.ladders.db.LadderFactory;
-
 public class SettingsUtil {
 
 	public static String getSetting(String name) throws IOException{

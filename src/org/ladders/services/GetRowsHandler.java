@@ -5,13 +5,11 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 
-import org.apache.commons.lang3.StringUtils;
 import org.ladders.db.AbstractDataStorage;
 import org.ladders.db.LadderFactory;
 import org.ladders.db.MyRecord;
 import org.ladders.util.Cols;
 import org.ladders.util.JsonUtil;
-import org.ladders.util.U;
 
 public class GetRowsHandler extends BaseHandler
 {

@@ -83,7 +83,7 @@ class StartLadders2
 
 		ResourceHandler resource_handler = new ResourceHandler();
 		resource_handler.setDirectoriesListed(true);
-		resource_handler.setWelcomeFiles(new String[] { "html/setup.html" });
+		resource_handler.setWelcomeFiles(new String[] { "/STATIC/html/landing.html" });
 		resource_handler.setResourceBase(U.startPath("."));
 
 		AbstractHandler masterHandler = new AbstractHandler() {

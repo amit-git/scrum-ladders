@@ -22,6 +22,7 @@ import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.store.LockObtainFailedException;
 import org.apache.lucene.store.NRTCachingDirectory;
+import org.apache.lucene.util.Version;
 import org.ladders.db.MyRecord.MyType;
 import org.ladders.util.Cols;
 import org.ladders.util.JsonUtil;
@@ -62,7 +63,7 @@ public class LuceneHelper
 
 		this.keyFieldName = keyFieldName;
 
-		analyzer = new StandardAnalyzer();
+		analyzer = new StandardAnalyzer(null);
 
 		Path path = Paths.get("/temp/" + dirName);
 		//Using Lucene as a transaction DB has its downsides.

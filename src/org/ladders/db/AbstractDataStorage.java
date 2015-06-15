@@ -6,14 +6,11 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import lombok.extern.java.Log;
-
 import org.ladders.util.Cols;
 import org.ladders.util.JsonUtil;
 import org.ladders.util.SettingsUtil;
 import org.ladders.util.U;
 
-@Log
 public abstract class AbstractDataStorage
 {
 	public static boolean		VALIDATE		= true;

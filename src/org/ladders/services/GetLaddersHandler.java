@@ -6,7 +6,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.json.JSONStringer;
 import org.json.JSONWriter;
 import org.ladders.db.LadderFactory;
-import org.ladders.util.SettingsUtil;
 
 public class GetLaddersHandler extends BaseHandler {
 

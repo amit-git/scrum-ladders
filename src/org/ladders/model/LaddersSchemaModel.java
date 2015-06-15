@@ -5,7 +5,6 @@ import java.util.List;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
-import org.ladders.util.U;
 
 public class LaddersSchemaModel
 {

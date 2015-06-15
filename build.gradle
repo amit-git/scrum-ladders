@@ -18,9 +18,11 @@ repositories {
 }
 
 dependencies {
-    compile fileTree(dir: 'lib', include: '*.jar')
-    compile fileTree(dir: 'lib/Lucene', include: '*.jar')
-    compile fileTree(dir: 'lib/OrientDB', include: '*.jar')
+
+	compile 'org.json:json:20140107'
+	compile 'org.apache.lucene:lucene-core:5.2.0'
+    compile 'org.apache.commons:commons-lang3:3.4'
+	compile 'org.apache.lucene:lucene-analyzers-common:4.6.0'
     compile 'org.eclipse.jetty:jetty-servlet:7.6.7.v20120910'
 
     compile 'junit:junit:4.12' // should be testCompile
