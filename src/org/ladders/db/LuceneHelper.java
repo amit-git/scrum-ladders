@@ -63,7 +63,7 @@ public class LuceneHelper
 
 		this.keyFieldName = keyFieldName;
 
-		analyzer = new StandardAnalyzer(null);
+		analyzer = new StandardAnalyzer();
 
 		Path path = Paths.get("/temp/" + dirName);
 		//Using Lucene as a transaction DB has its downsides.
