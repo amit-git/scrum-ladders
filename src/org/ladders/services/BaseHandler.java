@@ -39,7 +39,7 @@ public abstract class BaseHandler
 	protected TimestampLogger			tsLogger;
 	protected HashMap<String, String>	inputParams	= new HashMap<String, String>();
 	private ArrayList<String>			inputArr	= new ArrayList<String>();
-	protected String						rowType;
+	protected String					rowType;
 	protected String					parentId;
 
 	//private AbstractDataStorage		dao			= null;
@@ -86,7 +86,6 @@ public abstract class BaseHandler
 				ladderName = urlquery[2];
 				rowType = urlquery[3];
 
-				
 				assertTrue(!U.isNullOrBlank(ladderName), "No LADDER identified");
 				assertTrue(!U.isNullOrBlank(rowType), "No ROWTYPE identified");
 			}
@@ -127,7 +126,7 @@ public abstract class BaseHandler
 					parentId = RegUtil.match(andVals, "_parentId:([0-9a-zA-Z-]+)");
 			}
 			*/
-			
+
 			// U.log("inputParams.containsKey(" + Cols.ROWTYPE + "):" +
 			// inputParams.containsKey(Cols.ROWTYPE));
 			if (U.isNullOrBlank(rowType) && inputParams.containsKey(Cols.ROWTYPE))
@@ -139,6 +138,8 @@ public abstract class BaseHandler
 
 			innerHandle();
 
+		} catch (EofException eofe)
+		{
 		} catch (Exception e)
 		{
 			errorOut(e.toString());
@@ -324,10 +325,12 @@ public abstract class BaseHandler
 		exchange.sendResponseHeaders(200, 0);
 		OutputStream responseBody = exchange.getResponseBody();
 
-		try{
-		responseBody.write(out.getBytes());
-		}catch(EofException eof){
-			U.log("EOF error: "+eof.getMessage());
+		try
+		{
+			responseBody.write(out.getBytes());
+		} catch (EofException eof)
+		{
+			U.log("EOF error: " + eof.getMessage());
 		}
 
 		responseBody.close();
