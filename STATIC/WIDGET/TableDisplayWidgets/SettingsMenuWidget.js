@@ -43,8 +43,12 @@ Widget.SettingsMenuWidget = function(){
 			if (nextRow) htm.push( "<tr><td><a id='SettingsMenu_moveDown'>Move Down</a></td></tr>");
 			if (lastRow && nextRow && nextRow!=lastRow) htm.push( "<tr><td><a id='SettingsMenu_moveBottom'>Move to Bottom</a></td></tr>");
 
-			htm.push( "<tr><td>___________________</td></tr>");
-			htm.push( "<tr><td><a id='SettingsMenu_changeParent'>Change Parent</a></td></tr>");
+			
+			var parentRowType = Utils.getParentContextByName(currRow[ENV.ROWTYPE]);
+			if (parentRowType){
+				htm.push( "<tr><td>___________________</td></tr>");
+				htm.push( "<tr><td><a id='SettingsMenu_changeParent'>Change Parent</a></td></tr>");
+			}
 			
 			htm.push( "<tr><td>___________________</td></tr>");
 			htm.push( "<tr><td><a id='SettingsMenu_delete'>Delete</a></td></tr>");
@@ -83,7 +87,7 @@ Widget.SettingsMenuWidget = function(){
 			
 			$("#SettingsMenu_changeParent").click(function(){
 				menuDiv.html("");
-				changeParent(currRow);
+				changeParent(currRow, parentRowType);
 			});
 			
 
@@ -92,9 +96,53 @@ Widget.SettingsMenuWidget = function(){
 	}//render
 
 
+	
 
-	var changeParent = function(currRow){
+	var changeParent = function(currRow, parentRowType){
+
+		var currRowId = currRow[ENV.ROWID];
+		var currParentId = currRow[ENV.PARENTID];
+
+		SERVER.rows ({"_rowType": parentRowType.Name}, function(parentsData){
+			var arr = [];
+			var selectedIndex = 0;
+
+			for (var i=0; i<parentsData.Rows.length; i++){
+				var row = parentsData.Rows[i];
+				arr.push(row[ENV.ROWID]+": "+Utils.getShortDescription(row));
+				if (row[ENV.ROWID] == currParentId)
+					selectedIndex = i;
+			}//for i
+
+			var description = currRowId +": "+Utils.getShortDescription(currRow);
+
+			Utils.dialogArr (arr, "Change Parent", description, "Change", selectedIndex, function(i){
+				if (selectedIndex==i) return;
+				var newParentId = parentsData.Rows[i][ENV.ROWID];
+				currRow[ENV.PARENTID] = newParentId;
+
+				SERVER.update (currRowId, ENV.PARENTID, newParentId, false, function(){
+					//success
+					//alert("Changed Parent");
+		    		me.getEventManager().notify("parentChanged");
+					window.location.reload(true);
+		    		
+				}, function(){
+					//error
+					alert("Failed to change Parent");
+		    		me.getEventManager().notify("parentChanged");
+					window.location.reload(true);
+		    		
+				});
+
+			});
+			
+			
+		}, function(err){
+			alert("Error fetching Parent rows ");
+		}, true);
 		
+
 	};//changeParent()
 
 

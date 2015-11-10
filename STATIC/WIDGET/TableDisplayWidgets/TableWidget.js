@@ -195,6 +195,7 @@ Widget.TableWidget = function(cRowType){
 			
 		});
 		
+		
 		attachSwapEvents(div, r, "moveTop", arr, i, 0);
 		attachSwapEvents(div, r, "moveUp", arr, i, i-1);
 		attachSwapEvents(div, r, "moveDown", arr, i, i+1);

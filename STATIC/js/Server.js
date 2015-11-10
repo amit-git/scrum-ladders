@@ -50,7 +50,6 @@ SERVER.saveLadder = function(name, schemaJson, scallback, errcallback){
 	
 	//make sure it is valid.
 	try{
-		debugger;
 		var arr = eval(schemaJson);
 		Utils.validateLadders(arr);
 	}catch(ex){
@@ -170,8 +169,9 @@ SERVER._post = function(service, params, scallback, errcallback){
 	}
 	
 	var lName = ENV.LadderName?ENV.LadderName:params["LADDER_NAME"];
-	var rType = ENV.RowType?ENV.RowType:params["_rowType"];
-	
+	//var rType = ENV.RowType?ENV.RowType:params["_rowType"];
+	var rType = params["_rowType"]?params["_rowType"]:ENV.RowType;
+
 	var url = "/"+service+"/" + lName+"/" + rType+"/";
 			
 	//var url = ENV.LadderName?"/"+service+"/"+ENV.LadderName:"/"+service+"/";

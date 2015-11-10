@@ -11,6 +11,61 @@ ENV.CREATED_DATE = "_createdDate";
 ENV.UPDATE_DATE = "_updateDate";
 ENV.GRANDPAID = "_grandpaid";
 
+
+Utils.dialogArr = function(arr, title, description, btnText, selectedIndex, selectedCallback){
+	var radioName = Utils.getUid();
+	
+	var html = [];
+	html.push("<table border=0>");
+	for (var i=0; i<arr.length; i++){
+		html.push("<tr>");
+		
+		if (selectedIndex==i)
+			html.push("<td><input type='radio' name='"+radioName+"' value='"+i+"' checked> </td>");
+		else 
+			html.push("<td><input type='radio' name='"+radioName+"' value='"+i+"'> </td>");
+
+		html.push("<td>" + arr[i]+"</td>");
+		html.push("</tr>");
+	}//for i
+	html.push("</table>");
+	
+	Utils.dialogBox (title, description, btnText, html.join(""), function(){
+		var val = $('input:radio[name='+radioName+']:checked').val();
+		selectedCallback(val);
+		return true;
+	});
+}
+
+Utils.dialogBox = function (title, description, btnText, html, btnClicked){
+	
+	var btnid = Utils.getUid();
+	
+	$("#dialog").html("");
+	var diaOptions = {
+			width: 500,
+			height: 400,
+			modal: true, 
+			open: function (event, ui) {$('#dialog').css('overflow', 'scroll');} 
+	};
+	
+	var htm = [];
+	htm.push("<h1>"+title+"</h1>");
+	htm.push("<h3>"+description+"</h3>");
+	htm.push("<br/>"+html);
+	htm.push("<br/><input type='button' id='"+btnid+"' value='"+btnText+"'/>");
+	$("#dialog").append(htm.join("")).dialog(diaOptions);
+
+
+	$("#"+btnid).click(function(){
+		if (btnClicked()){
+			$("#dialog").dialog('close');
+		}
+	});
+
+};//Utils.dialogBox()
+
+
 Utils.getNameLabel = function(field){
 	if (!field.Name) new Utils.Exception("Utils.getNameLabel("+field+") doesn't accept null Name");
 	return field.Name.replace("_", " ");	
