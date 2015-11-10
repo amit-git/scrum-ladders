@@ -188,6 +188,20 @@ Utils.isEmpty = function(s){
 	return (s=="null" || s =="undefined" || s=="");
 };
 
+Utils.string2Array = function(str){
+	var retArr = [];
+	str = ""+str;
+	var arr = str.split(",");
+	for (var k=0; k<arr.length; k++){
+		var v = jQuery.trim(arr[k]);
+		if (v=="") continue;
+		retArr.push(v);
+	}//for k
+	return retArr;
+
+};//Utils.string2Array()
+
+
 //Must be called from the document.Load method.
 ENV.Setup = function(){
 
@@ -220,7 +234,13 @@ ENV.Setup = function(){
 			{
 				if (field.ColumnType=="Rollup"){
 					field.Widget = Widget.RollupWidget2;
-				}else if (field.ColumnType=="Select" && Utils.isArray(field.Args)){
+				}else if (field.ColumnType=="Select"){
+					
+					if (!Utils.isArray(field.Args)){
+						//Create an array from String
+						field.Args = Utils.string2Array(field.Args);
+					}
+					
 					field.Widget = Widget.SelectWidget;
 				}else if (field.ColumnType=="Text"){
 					field.Widget = Widget.TextEditor;
@@ -234,7 +254,7 @@ ENV.Setup = function(){
 			}
 
 		}//for i
-	}
+	}//for j
 
 	var context = Utils.getContextByName(ENV.RowType);	
 	

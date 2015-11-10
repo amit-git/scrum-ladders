@@ -12,10 +12,12 @@ Widget.LargeTextEditor = function(){
 		var saveClicked = function() {
 			var newVal = me.getVal();
 			var oldVal = rowData?rowData[field.Name]:null;
-			alert(newVal);
+			//alert(newVal);
 			if (newVal!=oldVal){
 				me.getEventManager().notify("change", me);
 			}
+			$("#dialog").dialog('close');
+
 		};//saveClicked()
 		
 		var val = rowData[field.Name];
@@ -35,15 +37,16 @@ Widget.LargeTextEditor = function(){
 			htm.push("<h1>Edit "+field.Name+"</h1>");
 			htm.push("<h3>"+Utils.getShortDescription(rowData)+"</h3>");
 			
-			htm.push("<input type='button' id='"+btnid+"' value='Save'/>");
-			htm.push("<textarea id='"+txtid+"' style='width:"+(diaOptions.width-70)+"px;height:"+(diaOptions.height-200)+"px;'></textarea>");
-			htm.push("<input type='button' id='"+btnid+"' value='Save'/>");
+			htm.push("<input type='button' id='Btn1"+btnid+"' value='Save'/>");
+			htm.push("<br/><textarea id='"+txtid+"' style='width:"+(diaOptions.width-70)+"px;height:"+(diaOptions.height-200)+"px;'></textarea>");
+			htm.push("<br/><input type='button' id='Btn2"+btnid+"' value='Save'/>");
 
 			$("#dialog").append(htm.join("")).dialog(diaOptions);
 
 			$("#"+txtid).val(val);
 
-			$("#"+btnid).click(saveClicked);
+			$("#Btn1"+btnid).click(saveClicked);
+			$("#Btn2"+btnid).click(saveClicked);
 			
 		});
 		

@@ -54,7 +54,10 @@ Widget.EditableListWidget2 = function(headerName, objArrWithName, selectionCallb
 		//---- ADD
 		$("#"+addId).click(function(){
 			var newval = acceptNew (headerName, null);
-			if (!newval) return;
+			if (!newval){
+				alert("Not adding. Value isn't valid.");
+				return;
+			}
 		    var newOpt = $("<option>"+newval+"</option>");
 			$("#"+selectId+" > option:selected").after(newOpt); //append new
 			valuesChanged();
@@ -154,7 +157,7 @@ Widget.EditableListWidget2 = function(headerName, objArrWithName, selectionCallb
 			var val = arr[i];
 			var ele = MAP[val];
 			if (!ele){
-				ele = {"Name":val};
+				ele = {"Name":val, "ColumnType":"Text"};
 				MAP[val] = ele;
 			}
 			newObjArr.push(MAP[val]);

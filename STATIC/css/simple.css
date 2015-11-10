@@ -32,7 +32,7 @@
 	padding:5px;
 }
 .item_action{
-	color: #3b5998;
+	color: #2f4f4f;
 	outline-style: none;
 	font-size: 11px;
 	font-weight: normal;
@@ -45,9 +45,21 @@
 	padding-right:20px;
 }
 
+.tableHeaderRow{
+	background-color:#2f4f4f;
+	color:white;
+	font-weight:normal;
+}
+
+.tableRow{
+	
+}
+.tableCell{
+	border:0px solid red;
+}
 
 .ld_link {
-	color: #3b5998;
+	color: #2f4f4f;
 	outline-style: none;
 	font-size: 10px;
 	font-weight: normal;
@@ -68,18 +80,24 @@
 }
 
 .top_menu_table{
-	background-color: #f7f7f7;
-	border: 1px solid black;
 	color: #333333;
-	padding: 7px;
+	padding: 10px;
 	font-family:Helvetica Neue, Helvetica, Arial, sans-serif;
 	text-shadow: rgba(0,0,0,.01) 0 0 1px;
-	font-size: 16px;
-	font-weight: bold;
+	font-size: 13px;
 	text-align: center;
 	cursor: hand;
 	cursor: pointer;
 	text-decoration: none;
+}
+
+.top_menu_selected{
+	background-color1: #2f4f4f;
+	color1:white;
+	font-size: 15px;
+	text-decoration: underline;
+	font-weight: bold;
+
 }
 
 
@@ -165,7 +183,6 @@
 .menuSectionStyle {
 	margin-top: 1px;
 	margin-bottom: 1px;
-	border: 1px solid #3b5978;
 }
 
 .settingsIconStyle {
@@ -175,7 +192,7 @@
 .ld_tab {
 	width:100%;
 	padding: 8px;
-	background-color: #3b5998;
+	background-color: #2f4f4f;
 	color: #dddddd;
 	font-weight: bold;
 	margin-right: 4px;

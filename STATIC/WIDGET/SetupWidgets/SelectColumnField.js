@@ -36,7 +36,7 @@ Widget.SelectColumnField = function(ele){
 		var colors = $("#"+eid+"Colors").val();
 
 		if (!validate("Arguments", args)) return false;
-		if (!validate("Colors", colors)) return false;
+		if (!Utils.isEmpty(colors) && !validate("Colors", colors)) return false;
 	
 		jsonMap.Args = args;
 		jsonMap.Colors = colors;

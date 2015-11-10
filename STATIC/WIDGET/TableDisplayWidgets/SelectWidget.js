@@ -23,7 +23,6 @@ Widget.SelectWidget = function(){
 	
 	this.render = function(div, field, rowData){
 		
-
 		var out = [];
 		out.push("<select id='"+id+"'><option></option>");
 

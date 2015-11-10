@@ -56,7 +56,7 @@ Widget.Row = function(rowType, envParentId){
 			out.push("</td>");
 		}else{
 			out.push("<td align='right'><img src='/STATIC/images/ChildTreeBranch.png' /></td>");
-			out.push("<td style='background-color:red'>New "+rowType+"</td> ");
+			out.push("<td style='background-color:red'>New "+rowType+"<br/><span class='ld_link'></span></td> ");
 		}		
 	}//renderIndexCell()
 	
@@ -101,7 +101,7 @@ Widget.Row = function(rowType, envParentId){
 		time.start("Prep Settings menu");
 		for (var i=0; i<schema.length; i++){
 			var field = schema[i];
-			out.push("<td id='"+ getCellId(field, rowData) +"'>....</td> ");
+			out.push("<td id='"+ getCellId(field, rowData) +"' class='tableCell'>....</td> ");
 		}//for i
 
 		div.html(out.join(" ") );

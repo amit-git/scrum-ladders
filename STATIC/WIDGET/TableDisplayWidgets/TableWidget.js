@@ -128,7 +128,8 @@ Widget.TableWidget = function(cRowType){
 			var id = Utils.getUid();
 			time.start("Append row");
 			//$('#'+tableId+' > tbody > tr:last').after("<tr id='"+ id +"'><td>Row at bottom</td></tr>");
-			tableObj.append("<tr id='"+ id +"'></tr>");
+			tableObj.append("<tr id='"+ id +"' class='tableRow'></tr>");
+			 
 			time.end("Append row");
 
 			_renderRowWidget (id, div, arr, i);
@@ -148,7 +149,7 @@ Widget.TableWidget = function(cRowType){
 
 		var htm = [];
 		htm.push("<table id='"+tableId+"' width='100%' class='ld_infobox'>");
-		htm.push("<tr><td></td>");
+		htm.push("<tr class='tableHeaderRow'><td></td>");
 		htm.push("<td></td>");//For child arrow
 
 		if (tableContext){

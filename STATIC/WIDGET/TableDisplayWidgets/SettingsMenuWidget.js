@@ -42,6 +42,9 @@ Widget.SettingsMenuWidget = function(){
 			if (prevRow) htm.push( "<tr><td><a id='SettingsMenu_moveUp'>Move Up</a></td></tr>");
 			if (nextRow) htm.push( "<tr><td><a id='SettingsMenu_moveDown'>Move Down</a></td></tr>");
 			if (lastRow && nextRow && nextRow!=lastRow) htm.push( "<tr><td><a id='SettingsMenu_moveBottom'>Move to Bottom</a></td></tr>");
+
+			htm.push( "<tr><td>___________________</td></tr>");
+			htm.push( "<tr><td><a id='SettingsMenu_changeParent'>Change Parent</a></td></tr>");
 			
 			htm.push( "<tr><td>___________________</td></tr>");
 			htm.push( "<tr><td><a id='SettingsMenu_delete'>Delete</a></td></tr>");
@@ -76,12 +79,25 @@ Widget.SettingsMenuWidget = function(){
 				menuDiv.html("");
 				deleteRowId(currRow[ENV.ROWID]);
 			});
+			
+			
+			$("#SettingsMenu_changeParent").click(function(){
+				menuDiv.html("");
+				changeParent(currRow);
+			});
+			
 
   		});
 		
 	}//render
-	
-	 
+
+
+
+	var changeParent = function(currRow){
+		
+	};//changeParent()
+
+
 
 	//deleteRowId
 	function deleteRowId(rowId){

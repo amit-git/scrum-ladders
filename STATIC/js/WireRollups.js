@@ -24,7 +24,9 @@ $( document ).ready(function() {
 		}, function(err){
 			alert("Error fetching ROWS ");
 		}, true);
-		
+
+		var w = new Widget.FilterRowWidget(ENV.RowType, ENV.InputParams);
+		w.render($("#filterDiv") );
 	 
 	}catch(ex){
 		$(document.body).html("ERROR:"+ex);

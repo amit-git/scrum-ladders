@@ -16,7 +16,7 @@ Widget.TextEditor = function(){
 			if (newVal!=oldVal){
 
 				if (field.MinLen && newVal.length<field.MinLen){
-					alert(field.Name+" Can't be less than '"+field.MinLen+"' characters.\n Current length is "+newVal.length+" characters");
+					//alert(field.Name+" Can't be less than '"+field.MinLen+"' characters.\n Current length is "+newVal.length+" characters");
 					return;
 				}else if (field.MaxLen && newVal.length>field.MaxLen){
 					alert(field.Name+" Can't be more than '"+field.MaxLen+"' characters.\n Current length is "+newVal.length+" characters");
