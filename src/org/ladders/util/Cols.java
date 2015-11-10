@@ -14,7 +14,26 @@ public class Cols
 	//public static final String	ROLLUP_PREFIX		= "_RLUP_";
 	public static final String	ROOT_PARENT_ID		= "ROOT";
 	public static final String	_PARENT_DESCRIPTION	= "_PARENT_DESCRIPTION";
-	public static final String	DESCRIPTION	= "Description";
-	public static final String	NAME	= "Name";
+	public static final String	DESCRIPTION			= "Description";
+	public static final String	NAME				= "Name";
 
+	public static boolean isSystemCol(String name)
+	{
+		if (name.equals(ROWID))
+			return true;
+		if (name.equals(PARENTID))
+			return true;
+		if (name.equals(ROWTYPE))
+			return true;
+		if (name.equals(CREATED_DATE))
+			return true;
+		if (name.equals(UPDATE_DATE))
+			return true;
+		if (name.equals(GRANDPAID))
+			return true;
+		if (name.equals(ROOT_PARENT_ID))
+			return true;
+
+		return false;
+	}
 }

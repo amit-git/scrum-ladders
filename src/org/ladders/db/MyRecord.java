@@ -61,6 +61,11 @@ public class MyRecord
 	{
 		map.put(k, v);
 	}
+	
+	void putObject(String k, Object v)
+	{
+		map.put(k, v);
+	}
 
 	public void put(String k, double v)
 	{

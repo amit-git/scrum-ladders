@@ -96,6 +96,26 @@ public class JsonUtil
 		return map;
 	}
 
+	
+	public static MyRecord toRecord(String json)
+	{
+		if (U.isNullOrBlank(json) || json.equals("null"))
+			return null;
+
+		JSONTokener tokener = new org.json.JSONTokener(json);
+		JSONObject jobj = new JSONObject(tokener);
+
+		MyRecord rec = new MyRecord();
+		for (Object key : jobj.keySet())
+		{
+			Object o = jobj.get(key.toString());
+			String v = o.toString();
+			rec.put(key.toString(), v);
+		}
+
+		return rec;
+	}
+	
 	/*
 	 * public static StringBuffer toJson1(ArrayList<BasicDBObject> rows) {
 	 * StringBuffer buf = new StringBuffer(); buf.append("["); for

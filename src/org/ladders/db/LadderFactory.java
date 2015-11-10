@@ -28,7 +28,7 @@ public class LadderFactory
 			//AbstractDataStorage ds = new LuceneDataStorage(ladderName); 
 			//pool.put(ladderName, ds);
 		}
-		return new LuceneDataStorage(ladderName);
+		return new CSVDataStorage(ladderName);
 	}
 
 	/*

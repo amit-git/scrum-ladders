@@ -15,7 +15,8 @@ public abstract class AbstractDataStorage
 {
 	public static boolean		VALIDATE		= true;
 	//protected RollupsManager	rollupsManager	= null;
-
+	protected String mLadderName = null;
+	
 	// Private constructor. Forced singleton
 	protected AbstractDataStorage(String ladderName) throws Exception
 	{
@@ -23,6 +24,7 @@ public abstract class AbstractDataStorage
 		{
 			throw new Exception("LADDER can't be null");
 		}
+		mLadderName = ladderName;
 
 		//rollupsManager = new RollupsManager(this);
 	}
