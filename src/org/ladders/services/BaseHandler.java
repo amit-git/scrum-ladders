@@ -407,4 +407,12 @@ public abstract class BaseHandler
 	{
 		return (BaseHandler) this.getClass().getDeclaredConstructors()[0].newInstance(null);
 	}
+	
+	protected String	outputType	= "JSON";
+
+	public void setOutputType(String o)
+	{
+		this.outputType = o;
+	}
+	
 }

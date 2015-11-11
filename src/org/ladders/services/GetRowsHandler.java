@@ -52,15 +52,16 @@ public class GetRowsHandler extends BaseHandler
 			String[] docIdList = pair[1].split(",");
 			HashSet<String> h = new HashSet<String>(Arrays.asList(docIdList));
 			allRows = dao.getRows(pair[0], h, fieldsList);
-		}else{
+		} else
+		{
 			HashMap<String, String> andPairs = new HashMap<String, String>();
 			andPairs.put(Cols.ROWTYPE, this.rowType);
-			
+
 			for (String key : inputParams.keySet())
 			{
 				andPairs.put(key, inputParams.get(key));
 			}// for p
-			
+
 			allRows = dao.getRows(andPairs, fieldsList);
 		}
 
@@ -73,14 +74,40 @@ public class GetRowsHandler extends BaseHandler
 			fillParentDescriptions(allRows);
 		}
 
-		StringBuffer buf1 = new StringBuffer("{");
-		buf1.append("Rows:").append(JsonUtil.toJsonFromRaw(allRows));
-		buf1.append(",\n\nParentRows:").append(JsonUtil.toJsonFromRaw(allParentRows));
-		buf1.append("}");
+		StringBuffer buf1 = new StringBuffer();
+
+		if (outputType.equalsIgnoreCase("STICKIES"))
+		{
+			buf1.append(generateStickies(allRows));
+		} else
+		{
+			buf1.append("{");
+			buf1.append("Rows:").append(JsonUtil.toJsonFromRaw(allRows));
+			buf1.append(",\n\nParentRows:").append(JsonUtil.toJsonFromRaw(allParentRows));
+			buf1.append("}");
+		}
 
 		tsLogger.log("Jsonified");
-
 		successOut("Got rows", buf1.toString());
+	}
+
+	private static StringBuffer generateStickies(ArrayList<MyRecord> allRows)
+	{
+		StringBuffer buf1 = new StringBuffer("<html>");
+		buf1.append("<html>");
+		buf1.append("<body>");
+
+		buf1.append("<div style='display: flex;'>");
+
+		for (MyRecord rec : allRows)
+		{
+			buf1.append("<div style='width: 200px;border:2px solid;background-color:green;'></div>");
+		}
+		
+		buf1.append("</div>");
+		buf1.append("</body>");
+		buf1.append("</html>");
+		return buf1;
 	}
 
 	private static HashSet<String> getUniqueVals(String fld, ArrayList<MyRecord> allRows) throws Exception
@@ -91,7 +118,7 @@ public class GetRowsHandler extends BaseHandler
 			String pid = dbObj.getString(fld);
 			if (pid == null)
 				continue;
-			
+
 			ids.add(pid);
 		}
 		return ids;
@@ -100,10 +127,11 @@ public class GetRowsHandler extends BaseHandler
 	private void fillParentDescriptions(ArrayList<MyRecord> allRows) throws Exception
 	{
 		HashSet<String> parentIds = getUniqueVals(Cols.PARENTID, allRows);
-		
+
 		AbstractDataStorage dao = LadderFactory.getLadder(this.getLadderName());
-		
-		ArrayList<MyRecord> allParentRows = dao.getRows(Cols.ROWID, parentIds, new String[] { Cols.ROWID, Cols.DESCRIPTION });
+
+		ArrayList<MyRecord> allParentRows = dao.getRows(Cols.ROWID, parentIds, new String[] { Cols.ROWID,
+				Cols.DESCRIPTION });
 
 		HashMap<String, String> descriptions = new HashMap<String, String>();
 		for (MyRecord rec : allParentRows)
@@ -111,7 +139,7 @@ public class GetRowsHandler extends BaseHandler
 			//U.log("PARENTS fillParentDescriptions: "+rec);
 			descriptions.put(rec.getString(Cols.ROWID), rec.getString(Cols.DESCRIPTION));
 		}
-		
+
 		for (MyRecord rec : allRows)
 		{
 			String parentId = rec.getString(Cols.PARENTID);
@@ -119,7 +147,6 @@ public class GetRowsHandler extends BaseHandler
 			//U.log("CHILD fillParentDescriptions: "+rec);
 		}
 	}
-
 
 	@Override
 	protected boolean actionOnLadder()

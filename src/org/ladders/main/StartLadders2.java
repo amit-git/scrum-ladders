@@ -35,6 +35,10 @@ class StartLadders2
 	static
 	{
 		MAP.put("ROWS", new GetRowsHandler());
+		MAP.put("STICKIES", new GetRowsHandler());
+		
+		MAP.get("STICKIES").setOutputType("STICKIES");
+		
 		MAP.put("DELETE", new DeleteHandler());
 		MAP.put("INSERT", new InsertHandler());
 		MAP.put("UPDATE", new UpdateHandler());
